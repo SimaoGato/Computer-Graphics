@@ -2,14 +2,19 @@
 /* GLOBAL VARIABLES */
 //////////////////////
 
-/* cameras vars */ var frontCamera, upperCamera, lateralCamera, perspectiveCamera;
+var scene, renderer;
 
+/* cameras vars */ var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera;
 
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
 function createScene(){
     'use strict';
+
+    scene = new THREE.Scene();
+
+    scene.add(new THREE.AxisHelper(10));
 
 }
 
@@ -107,6 +112,7 @@ function update(){
 /////////////
 function render() {
     'use strict';
+    renderer.render(scene, camera);
 
 }
 
@@ -116,6 +122,25 @@ function render() {
 function init() {
     'use strict';
 
+    renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    createScene();
+    
+    createPerspectiveCamera();
+    createFrontCamera();
+    createUpperCamera();
+    createLateralCamera();
+
+    camera = perspectiveCamera;
+
+    render();
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", onResize);
 }
 
 /////////////////////
@@ -124,6 +149,9 @@ function init() {
 function animate() {
     'use strict';
 
+    render();
+
+    requestAnimationFrame(animate);
 }
 
 ////////////////////////////
@@ -131,7 +159,13 @@ function animate() {
 ////////////////////////////
 function onResize() { 
     'use strict';
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    }
 }
 
 ///////////////////////
@@ -140,6 +174,21 @@ function onResize() {
 function onKeyDown(e) {
     'use strict';
 
+    switch (e.keyCode) {
+
+        case 49: // 1 - Front Camera
+            camera = frontCamera;
+            break;
+        case 50: // 2 - Lateral Camera
+            camera = lateralCamera;
+            break;
+        case 51: // 3 - Upper Camera
+            camera = upperCamera;
+            break;
+        case 52: // 4 - Perspective Camera
+            camera = perspectiveCamera;
+            break;
+    }
 }
 
 ///////////////////////
