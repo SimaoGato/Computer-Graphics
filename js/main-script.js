@@ -4,7 +4,7 @@
 
 var scene, renderer;
 
-/* cameras vars */ var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera;
+/* cameras vars */ var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera, ortogonalCamera;
 
 /* Robot */ var robot, robotMaterial;
 
@@ -35,6 +35,20 @@ function createPerspectiveCamera() {
     perspectiveCamera.position.y = 20;
     perspectiveCamera.position.z = 20;
     perspectiveCamera.lookAt(scene.position);
+}
+
+function createOrtogonalCamera() {
+    'use strict';
+    ortogonalCamera = new THREE.OrthographicCamera(window.innerWidth / -25,
+                                         window.innerWidth / 25,
+                                         window.innerHeight / 25,
+                                         window.innerHeight / -25,
+                                         1,
+                                         1000);
+    ortogonalCamera.position.x = -10;
+    ortogonalCamera.position.y = -5;
+    ortogonalCamera.position.z = 10;
+    ortogonalCamera.lookAt(scene.position);
 }
 
 function createFrontCamera() {
@@ -87,7 +101,7 @@ function createLateralCamera() {
 /* CREATE OBJECT3D(S) */
 ////////////////////////
 
-function createRobot(){
+function createRobot() {
     'use strict';
 
     var gWaist;
@@ -104,7 +118,7 @@ function createRobot(){
     scene.add(robot);
 }
 
-function createRobotWaist(gWaist){
+function createRobotWaist(gWaist) {
 
     'use strict';
 
@@ -131,7 +145,7 @@ function createRobotWaist(gWaist){
     robot.add(gWaist);
 }
 
-function createRobotAbdomen(gWaist, yWaist){
+function createRobotAbdomen(gWaist, yWaist) {
 
     'use strict';
 
@@ -148,7 +162,7 @@ function createRobotAbdomen(gWaist, yWaist){
     gWaist.add(gAbdomen);
 }
 
-function createRobotTorso(gAbdomen, yAbdomen){
+function createRobotTorso(gAbdomen, yAbdomen) {
 
     'use strict';
 
@@ -160,7 +174,60 @@ function createRobotTorso(gAbdomen, yAbdomen){
     pTorso.position.set(0, 0, 0);
     gTorso.add(pTorso);
 
+    createRobotHead(gTorso, yTorso);
+
     gAbdomen.add(gTorso);
+}
+
+function createRobotHead(gTorso, yTorso) {
+
+    'use strict';
+
+    var gHead = new THREE.Object3D();
+    var xHead = 4, yHead = 4, zHead = 4;
+    gHead.position.set(0, yTorso / 2 + yHead / 2, 0);
+
+    var pHead = new THREE.Mesh(new THREE.BoxGeometry(xHead, yHead, zHead), robotMaterial);
+    pHead.position.set(0, 0, 0);
+    gHead.add(pHead);
+
+    createRobotEye(gHead, xHead, yHead, zHead, 1);
+    createRobotEye(gHead, xHead, yHead, zHead, -1);
+    createRobotAntenna(gHead, xHead, yHead, zHead, 1);
+    createRobotAntenna(gHead, xHead, yHead, zHead, -1);
+
+    gTorso.add(gHead);
+}
+
+
+function createRobotEye(gHead, xHead, yHead, zHead, side) {
+
+    'use strict'
+
+    var  gEye = new THREE.Object3D();
+    var xEye = 1, yEye = 1, zEye = 1;
+    gEye.position.set(side * (xHead/4), yHead/8, zHead/2);
+
+    var pEye = new THREE.Mesh(new THREE.BoxGeometry(xEye, yEye, zEye), robotMaterial);
+    pEye.position.set(0, 0, 0);
+    gEye.add(pEye);
+
+    gHead.add(gEye);
+}
+
+function createRobotAntenna(gHead, xHead, yHead, zHead, side) {
+
+    'use strict'
+
+    var gAntenna = new THREE.Object3D();
+    var rAntenna = 0.5, hAntenna = 3;
+    gAntenna.position.set(side * (rAntenna + (xHead/2)), (3 * yHead) / 8, -zHead / 8);
+
+    var pAntenna = new THREE.Mesh(new THREE.CylinderGeometry(rAntenna, rAntenna, hAntenna), robotMaterial);
+    pAntenna.position.set(0, 0, 0);
+    gAntenna.add(pAntenna);
+
+    gHead.add(gAntenna);
 }
 
 //////////////////////
@@ -214,6 +281,7 @@ function init() {
     createFrontCamera();
     createUpperCamera();
     createLateralCamera();
+    createOrtogonalCamera();
 
     camera = perspectiveCamera;
 
@@ -268,14 +336,13 @@ function onKeyDown(e) {
         case 52: // 4 - Perspective Camera
             camera = perspectiveCamera;
             break;
+        case 53: // 4 - Ortogonal Camera
+            camera = ortogonalCamera;
+            break;
 
         case 54: // 6 - Wireframe
     
-            scene.traverse(function (node) {
-                if (node instanceof THREE.Mesh) {
-                    node.material.wireframe = !node.material.wireframe;
-                }
-            });
+            robotMaterial.wireframe = !robotMaterial.wireframe;
             break;
     }
 }
