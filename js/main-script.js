@@ -53,10 +53,10 @@ function createOrtogonalCamera() {
 
 function createFrontCamera() {
     'use strict';
-    frontCamera = new THREE.OrthographicCamera(window.innerWidth / -13,
-                                         window.innerWidth / 13,
-                                         window.innerHeight / 13,
-                                         window.innerHeight / -13,
+    frontCamera = new THREE.OrthographicCamera(window.innerWidth / -25,
+                                         window.innerWidth / 25,
+                                         window.innerHeight / 25,
+                                         window.innerHeight / -25,
                                          0.1,
                                          1000);
     frontCamera.position.x = 0;
@@ -67,10 +67,10 @@ function createFrontCamera() {
 
 function createUpperCamera() {
     'use strict';
-    upperCamera = new THREE.OrthographicCamera(window.innerWidth / -13,
-                                         window.innerWidth / 13,
-                                         window.innerHeight / 13,
-                                         window.innerHeight / -13,
+    upperCamera = new THREE.OrthographicCamera(window.innerWidth / -25,
+                                         window.innerWidth / 25,
+                                         window.innerHeight / 25,
+                                         window.innerHeight / -25,
                                          0.1,
                                          1000);
     upperCamera.position.x = 0;
@@ -81,10 +81,10 @@ function createUpperCamera() {
 
 function createLateralCamera() {
     'use strict';
-    lateralCamera = new THREE.OrthographicCamera(window.innerWidth / -13,
-                                         window.innerWidth / 13,
-                                         window.innerHeight / 13,
-                                         window.innerHeight / -13,
+    lateralCamera = new THREE.OrthographicCamera(window.innerWidth / -25,
+                                         window.innerWidth / 25,
+                                         window.innerHeight / 25,
+                                         window.innerHeight / -25,
                                          0.1,
                                          1000);
     lateralCamera.position.x = 10;
