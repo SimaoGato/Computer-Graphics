@@ -178,8 +178,8 @@ function createRobotWaist(gWaist) {
     gWaist.add(pLeftWheel);
 
     createRobotAbdomen(gWaist, yWaist);
-    createRobotThigh(gWaist, xWaist, yWaist, robotSide.LEFT);
-    createRobotThigh(gWaist, xWaist, yWaist, robotSide.RIGHT);
+    createRobotThigh(gWaist, xWaist, yWaist, zWaist, robotSide.LEFT);
+    createRobotThigh(gWaist, xWaist, yWaist, zWaist, robotSide.RIGHT);
 
     robot.add(gWaist);
 }
@@ -217,20 +217,20 @@ function createRobotTorso(gAbdomen, yAbdomen) {
     primitives.push(pTorso);
     gTorso.add(pTorso);
 
-    createRobotHead(gTorso, yTorso);
+    createRobotHead(gTorso, yTorso, zTorso);
     createRobotArm(gTorso, xTorso, zTorso, robotSide.LEFT);
     createRobotArm(gTorso, xTorso, zTorso, robotSide.RIGHT);
 
     gAbdomen.add(gTorso);
 }
 
-function createRobotHead(gTorso, yTorso) {
+function createRobotHead(gTorso, yTorso, zTorso) {
 
     'use strict';
 
     var gHead = new THREE.Object3D();
     var xHead = 4, yHead = 4, zHead = 4;
-    gHead.position.set(0, yTorso / 2 + yHead / 2, 0);
+    gHead.position.set(0, yTorso / 2 + yHead / 2, zTorso / 5);
 
     var pHeadMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: false });
     var pHead = new THREE.Mesh(new THREE.BoxGeometry(xHead, yHead, zHead), pHeadMaterial);
@@ -332,13 +332,13 @@ function createRobotExhaustPipe(gArm, xArm, yArm, side) {
     gArm.add(gExhaustPipe);
 }
 
-function createRobotThigh(gWaist, xWaist, yWaist, side) {
+function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
     
     'use strict';
 
     var gThigh = new THREE.Object3D();
     var xThigh = 2, yThigh = 4, zThigh = 2;
-    gThigh.position.set(side * (3 * xWaist) / 10, -yWaist / 2 - yThigh / 2, 0);
+    gThigh.position.set(side * (3 * xWaist) / 10, -yWaist / 2 - yThigh / 2, -zWaist / 10);
 
     var pThighMaterial = new THREE.MeshBasicMaterial({color: colors.PURPLE,wireframe: false });
     var pThigh = new THREE.Mesh(new THREE.BoxGeometry(xThigh, yThigh, zThigh), pThighMaterial);
