@@ -158,14 +158,14 @@ function createRobotWaist(gWaist) {
 
     gWaist = new THREE.Object3D();
 
-    var pWaistMaterial = new THREE.MeshBasicMaterial({color: colors.BROWN,wireframe: false });
+    var pWaistMaterial = new THREE.MeshBasicMaterial({color: colors.BROWN,wireframe: wireframe });
     var xWaist = 10, yWaist = 4, zWaist = 10;
     var pWaist = new THREE.Mesh(new THREE.BoxGeometry(xWaist, yWaist, zWaist), pWaistMaterial);
     pWaist.position.set(0, 0, 0);
     primitives.push(pWaist);
     gWaist.add(pWaist);
 
-    var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: false });
+    var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
     
     var radTopWheel = 2, radBottomWheel = 2, heightWheel = 2;
     var pRightWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
@@ -195,7 +195,7 @@ function createRobotAbdomen(gWaist, yWaist) {
     var xAbdomen = 8, yAbdomen = 3, zAbdomen = 10;
     gAbdomen.position.set(0, yWaist / 2 + yAbdomen / 2, 0);
 
-    var pAbdomenMaterial = new THREE.MeshBasicMaterial({color: colors.ORANGE,wireframe: false });
+    var pAbdomenMaterial = new THREE.MeshBasicMaterial({color: colors.ORANGE,wireframe: wireframe });
     var pAbdomen = new THREE.Mesh(new THREE.BoxGeometry(xAbdomen, yAbdomen, zAbdomen), pAbdomenMaterial);
     pAbdomen.position.set(0, 0, 0);
     primitives.push(pAbdomen);
@@ -214,7 +214,7 @@ function createRobotTorso(gAbdomen, yAbdomen) {
     var xTorso = 14, yTorso = 6, zTorso = 10;
     gTorso.position.set(0, yAbdomen / 2 + yTorso / 2, 0);
 
-    var pTorsoMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW,wireframe: false });
+    var pTorsoMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW,wireframe: wireframe });
     var pTorso = new THREE.Mesh(new THREE.BoxGeometry(xTorso, yTorso, zTorso), pTorsoMaterial);
     pTorso.position.set(0, 0, 0);
     primitives.push(pTorso);
@@ -235,7 +235,7 @@ function createRobotHead(gTorso, yTorso, zTorso) {
     var xHead = 4, yHead = 4, zHead = 4;
     gHead.position.set(0, yTorso / 2 + yHead / 2, zTorso / 5);
 
-    var pHeadMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: false });
+    var pHeadMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: wireframe });
     var pHead = new THREE.Mesh(new THREE.BoxGeometry(xHead, yHead, zHead), pHeadMaterial);
     pHead.position.set(0, 0, 0);
     primitives.push(pHead);
@@ -258,7 +258,7 @@ function createRobotEye(gHead, xHead, yHead, zHead, side) {
     var xEye = 1, yEye = 1, zEye = 1;
     gEye.position.set(side * (xHead/4), yHead/8, zHead/2);
 
-    var pArmMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: false });
+    var pArmMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
     var pEye = new THREE.Mesh(new THREE.BoxGeometry(xEye, yEye, zEye), pArmMaterial);
     pEye.position.set(0, 0, 0);
     primitives.push(pEye);
@@ -275,7 +275,7 @@ function createRobotAntenna(gHead, xHead, yHead, zHead, side) {
     var rAntenna = 0.5, hAntenna = 3;
     gAntenna.position.set(side * (rAntenna + (xHead/2)), (3 * yHead) / 8, -zHead / 8);
 
-    var pAntennaMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: false });
+    var pAntennaMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
     var pAntenna = new THREE.Mesh(new THREE.CylinderGeometry(rAntenna, rAntenna, hAntenna), pAntennaMaterial);
     pAntenna.position.set(0, 0, 0);
     primitives.push(pAntenna);
@@ -292,13 +292,13 @@ function createRobotArm(gTorso, xTorso, zTorso, side) {
     var xArm = 3, yArm = 6, zArm = 3;
     gArm.position.set(side * (xTorso / 2 + xArm / 2), 0, - ( 7 * zTorso) / 20);
 
-    var pArmMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: false });
+    var pArmMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: wireframe });
     var pArm = new THREE.Mesh(new THREE.BoxGeometry(xArm, yArm, zArm), pArmMaterial);
     pArm.position.set(0, 0, 0);
     primitives.push(pArm);
     gArm.add(pArm);
 
-    var pForearmMaterial = new THREE.MeshBasicMaterial({color: colors.BLUE,wireframe: false });
+    var pForearmMaterial = new THREE.MeshBasicMaterial({color: colors.BLUE,wireframe: wireframe });
     var xForearm = 3, yForearm = 3, zForearm = 10;
     var pForearm = new THREE.Mesh(new THREE.BoxGeometry(xForearm, yForearm, zForearm), pForearmMaterial);
     pForearm.position.set(0, -yArm / 2 - yForearm / 2, (7 * zArm) / 6);
@@ -319,13 +319,13 @@ function createRobotExhaustPipe(gArm, xArm, yArm, side) {
     var radExhaustPipe = 0.5, hExhaustPipe = 5;
     gExhaustPipe.position.set(side * (xArm / 2 + radExhaustPipe / 2), - (yArm / 12), 0);
 
-    var pExhaustPipeMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: false });
+    var pExhaustPipeMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
     var pExhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(radExhaustPipe, radExhaustPipe, hExhaustPipe), pExhaustPipeMaterial);
     pExhaustPipe.position.set(0, 0, 0);
     primitives.push(pExhaustPipe);
     gExhaustPipe.add(pExhaustPipe);
 
-    var pTopExhaustPipeMaterial = new THREE.MeshBasicMaterial({color: colors.SILVER,wireframe: false });
+    var pTopExhaustPipeMaterial = new THREE.MeshBasicMaterial({color: colors.SILVER,wireframe: wireframe });
     var radTopExhaustPipe = 0.2, hTopExhaustPipe = 2;
     var pTopExhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(radTopExhaustPipe, radTopExhaustPipe, hTopExhaustPipe), pTopExhaustPipeMaterial);
     pTopExhaustPipe.position.set(0, hExhaustPipe / 2 + hTopExhaustPipe / 2, 0);
@@ -343,7 +343,7 @@ function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
     var xThigh = 2, yThigh = 4, zThigh = 2;
     gThigh.position.set(side * (3 * xWaist) / 10, -yWaist / 2 - yThigh / 2, -zWaist / 10);
 
-    var pThighMaterial = new THREE.MeshBasicMaterial({color: colors.PURPLE,wireframe: false });
+    var pThighMaterial = new THREE.MeshBasicMaterial({color: colors.PURPLE,wireframe: wireframe });
     var pThigh = new THREE.Mesh(new THREE.BoxGeometry(xThigh, yThigh, zThigh), pThighMaterial);
     pThigh.position.set(0, 0, 0);
     primitives.push(pThigh);
@@ -362,7 +362,7 @@ function createRobotLeg(gThigh, yThigh, side) {
     var xLeg = 4, yLeg = 10, zLeg = 4;
     gLeg.position.set(0, -yThigh / 2 - yLeg / 2, 0);
 
-    var pLegMaterial = new THREE.MeshBasicMaterial({color: colors.GREEN,wireframe: false });
+    var pLegMaterial = new THREE.MeshBasicMaterial({color: colors.GREEN,wireframe: wireframe });
     var pLeg = new THREE.Mesh(new THREE.BoxGeometry(side * xLeg, yLeg, zLeg), pLegMaterial);
     pLeg.position.set(0, 0, 0);
     primitives.push(pLeg);
@@ -370,7 +370,7 @@ function createRobotLeg(gThigh, yThigh, side) {
 
     var radTopWheel = 2, radBottomWheel = 2, heightWheel = 2;
 
-    var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: false });
+    var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
 
     var pTopWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radTopWheel, heightWheel), pWheelMaterial);
     pTopWheel.rotation.z = Math.PI / 2;
@@ -397,7 +397,7 @@ function createRobotFoot(gLeg, yLeg, zLeg) {
     var xFoot = 4, yFoot = 2, zFoot = 4;
     gFoot.position.set(0, - yLeg / 2 - yFoot / 2, zLeg / 2);
 
-    var pFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: false });
+    var pFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: wireframe });
     var pFoot = new THREE.Mesh(new THREE.BoxGeometry(xFoot, yFoot, zFoot), pFootMaterial);
     pFoot.position.set(0, 0, 0);
     primitives.push(pFoot);
@@ -427,7 +427,7 @@ function createTrailerContainer(gContainer) {
     var gContainer = new THREE.Object3D();
     var xContainer = 14, yContainer = 16, zContainer = 36;
 
-    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW, wireframe: false });
+    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW, wireframe: wireframe });
     var pContainer = new THREE.Mesh(new THREE.BoxGeometry(xContainer, yContainer, zContainer), pContainerMaterial);
     pContainer.position.set(0, 0, 0);
     primitives.push(pContainer);
@@ -435,7 +435,7 @@ function createTrailerContainer(gContainer) {
 
     trailer.add(gContainer)
 
-    var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: false });
+    var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
 
     var radTopWheel = 2, radBottomWheel = 2, heightWheel = 2;
     
