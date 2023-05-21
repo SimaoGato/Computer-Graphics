@@ -55,7 +55,7 @@ function createScene(){
 
     scene.background = new THREE.Color(colors.GREY);
     scene.add(new THREE.AxisHelper(10));
-
+    
     createRobot();
     createTrailer();
 }
@@ -161,6 +161,9 @@ function createRobotWaist(gWaist) {
     var pWaistMaterial = new THREE.MeshBasicMaterial({color: colors.BROWN,wireframe: wireframe });
     var xWaist = 10, yWaist = 4, zWaist = 10;
     var pWaist = new THREE.Mesh(new THREE.BoxGeometry(xWaist, yWaist, zWaist), pWaistMaterial);
+    
+    gWaist.position.set(0, yWaist / 2, 0);
+    
     pWaist.position.set(0, 0, 0);
     primitives.push(pWaist);
     gWaist.add(pWaist);
@@ -413,7 +416,7 @@ function createTrailer() {
     var gContainer;
 
     trailer = new THREE.Object3D();
-    trailer.position.set(0, 0, -30);
+    trailer.position.set(0, 9.5, -30);
 
     createTrailerContainer(gContainer);
 
@@ -425,43 +428,115 @@ function createTrailerContainer(gContainer) {
     'use strict'
 
     var gContainer = new THREE.Object3D();
-    var xContainer = 14, yContainer = 16, zContainer = 36;
+    var xContainer = 14, yContainer = 13, zContainer = 36;
 
     var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE, wireframe: wireframe });
     var pContainer = new THREE.Mesh(new THREE.BoxGeometry(xContainer, yContainer, zContainer), pContainerMaterial);
     pContainer.position.set(0, 0, 0);
     primitives.push(pContainer);
     gContainer.add(pContainer);
+    
+    trailer.add(gContainer);
 
-    trailer.add(gContainer)
+    createWheelAxe(gContainer, xContainer, yContainer, zContainer);
+    createContainerBottomFront(gContainer, xContainer, yContainer, zContainer);
+    createContainerBottomMiddle(gContainer, xContainer, yContainer, zContainer);
+    createContainerBottomBack(gContainer, xContainer, yContainer, zContainer);
+}
 
+function createWheelAxe(gContainer, xContainer, yContainer, zContainer) {
+    
+    'use strict'
+    
+    var gWheelAxe = new THREE.Object3D();
+    var xWheelAxe = 8, yWheelAxe = 3, zWheelAxe = 11;
+    gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, - zContainer / (36 / 8.5));
+    
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.PINK, wireframe: wireframe });
+    var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
+    pWheelAxe.position.set(0, 0, 0);
+    primitives.push(pWheelAxe);
+    gWheelAxe.add(pWheelAxe);
+    
     var pWheelMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
-
+    
     var radTopWheel = 2, radBottomWheel = 2, heightWheel = 2;
     
     var pRightBackWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pRightBackWheel.rotation.z = Math.PI / 2;
-    pRightBackWheel.position.set(- xContainer * 5 / 14, -yContainer / 2, -zContainer / 3);
+    pRightBackWheel.position.set(- xWheelAxe / 2, - yWheelAxe / 3, - zWheelAxe / (11 / 3.5));
     primitives.push(pRightBackWheel);
-    gContainer.add(pRightBackWheel);
-
+    gWheelAxe.add(pRightBackWheel);
+    
     var pLeftBackWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pLeftBackWheel.rotation.z = Math.PI / 2;
-    pLeftBackWheel.position.set(xContainer * 5 / 14,  -yContainer / 2, -zContainer / 3);
+    pLeftBackWheel.position.set(xWheelAxe / 2, - yWheelAxe / 3, - zWheelAxe / (11 / 3.5));
     primitives.push(pLeftBackWheel);
-    gContainer.add(pLeftBackWheel);
+    gWheelAxe.add(pLeftBackWheel);
     
     var pRightFrontWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pRightFrontWheel.rotation.z = Math.PI / 2;
-    pRightFrontWheel.position.set(- xContainer * 5 / 14, -yContainer / 2, -zContainer * 5 / 36);
+    pRightFrontWheel.position.set(xWheelAxe / 2, - yWheelAxe / 3, zWheelAxe / (11 / 3.5));
     primitives.push(pRightFrontWheel);
-    gContainer.add(pRightFrontWheel);
-
+    gWheelAxe.add(pRightFrontWheel);
+    
     var pLeftFrontWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pLeftFrontWheel.rotation.z = Math.PI / 2;
-    pLeftFrontWheel.position.set(xContainer * 5 / 14,  -yContainer / 2, -zContainer * 5 / 36);
+    pLeftFrontWheel.position.set(- xWheelAxe / 2, - yWheelAxe / 3, zWheelAxe / (11 / 3.5));
     primitives.push(pLeftFrontWheel);
-    gContainer.add(pLeftFrontWheel);
+    gWheelAxe.add(pLeftFrontWheel);
+    
+    gContainer.add(gWheelAxe);
+}
+
+function createContainerBottomFront(gContainer, xContainer, yContainer, zContainer) {
+
+    'use strict'
+    
+    var gWheelAxe = new THREE.Object3D();
+    var xWheelAxe = 14, yWheelAxe = 3, zWheelAxe = 21;
+    gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, 7.5);
+    
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN, wireframe: wireframe });
+    var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
+    pWheelAxe.position.set(0, 0, 0);
+    primitives.push(pWheelAxe);
+    gWheelAxe.add(pWheelAxe);
+
+    gContainer.add(gWheelAxe);
+}
+
+function createContainerBottomMiddle(gContainer, xContainer, yContainer, zContainer) {
+
+    'use strict'
+    
+    var gWheelAxe = new THREE.Object3D();
+    var xWheelAxe = 14, yWheelAxe = 3, zWheelAxe = 3;
+    gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, -8.5);
+    
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.GREEN, wireframe: wireframe });
+    var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
+    pWheelAxe.position.set(0, 0, 0);
+    primitives.push(pWheelAxe);
+    gWheelAxe.add(pWheelAxe);
+
+    gContainer.add(gWheelAxe);
+}
+function createContainerBottomBack(gContainer, xContainer, yContainer, zContainer) {
+
+    'use strict'
+    
+    var gWheelAxe = new THREE.Object3D();
+    var xWheelAxe = 14, yWheelAxe = 3, zWheelAxe = 4;
+    gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, -16);
+    
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.RED, wireframe: wireframe });
+    var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
+    pWheelAxe.position.set(0, 0, 0);
+    primitives.push(pWheelAxe);
+    gWheelAxe.add(pWheelAxe);
+
+    gContainer.add(gWheelAxe);
 }
 
 //////////////////////
