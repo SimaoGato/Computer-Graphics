@@ -57,7 +57,7 @@ function createScene(){
     scene.add(new THREE.AxisHelper(10));
 
     createRobot();
-    //createTrailer();
+    createTrailer();
 }
 
 //////////////////////
@@ -83,9 +83,9 @@ function createOrtogonalCamera() {
                                          window.innerHeight / -25,
                                          1,
                                          1000);
-    ortogonalCamera.position.x = -10;
-    ortogonalCamera.position.y = -5;
-    ortogonalCamera.position.z = 10;
+    ortogonalCamera.position.x = -20;
+    ortogonalCamera.position.y = -10;
+    ortogonalCamera.position.z = 20;
     ortogonalCamera.lookAt(scene.position);
 }
 
@@ -99,7 +99,7 @@ function createFrontCamera() {
                                          1000);
     frontCamera.position.x = 0;
     frontCamera.position.y = 0;
-    frontCamera.position.z = 10;
+    frontCamera.position.z = 20;
     frontCamera.lookAt(scene.position);
 }
 
@@ -125,7 +125,7 @@ function createLateralCamera() {
                                          window.innerHeight / -25,
                                          0.1,
                                          1000);
-    lateralCamera.position.x = -10;
+    lateralCamera.position.x = -20;
     lateralCamera.position.y = 0;
     lateralCamera.position.z = 0;
     lateralCamera.lookAt(scene.position);
@@ -413,7 +413,7 @@ function createTrailer() {
     var gContainer;
 
     trailer = new THREE.Object3D();
-    trailer.position.set(0, 0, 0);
+    trailer.position.set(0, 0, -30);
 
     createTrailerContainer(gContainer);
 
@@ -427,7 +427,7 @@ function createTrailerContainer(gContainer) {
     var gContainer = new THREE.Object3D();
     var xContainer = 14, yContainer = 16, zContainer = 36;
 
-    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW, wireframe: wireframe });
+    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE, wireframe: wireframe });
     var pContainer = new THREE.Mesh(new THREE.BoxGeometry(xContainer, yContainer, zContainer), pContainerMaterial);
     pContainer.position.set(0, 0, 0);
     primitives.push(pContainer);
@@ -441,25 +441,25 @@ function createTrailerContainer(gContainer) {
     
     var pRightBackWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pRightBackWheel.rotation.z = Math.PI / 2;
-    pRightBackWheel.position.set(- xContainer * 5 / 14, -yContainer / 2, zContainer / 3);
+    pRightBackWheel.position.set(- xContainer * 5 / 14, -yContainer / 2, -zContainer / 3);
     primitives.push(pRightBackWheel);
     gContainer.add(pRightBackWheel);
 
     var pLeftBackWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pLeftBackWheel.rotation.z = Math.PI / 2;
-    pLeftBackWheel.position.set(xContainer * 5 / 14,  -yContainer / 2, zContainer / 3);
+    pLeftBackWheel.position.set(xContainer * 5 / 14,  -yContainer / 2, -zContainer / 3);
     primitives.push(pLeftBackWheel);
     gContainer.add(pLeftBackWheel);
     
     var pRightFrontWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pRightFrontWheel.rotation.z = Math.PI / 2;
-    pRightFrontWheel.position.set(- xContainer * 5 / 14, -yContainer / 2, zContainer * 5 / 36);
+    pRightFrontWheel.position.set(- xContainer * 5 / 14, -yContainer / 2, -zContainer * 5 / 36);
     primitives.push(pRightFrontWheel);
     gContainer.add(pRightFrontWheel);
 
     var pLeftFrontWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pLeftFrontWheel.rotation.z = Math.PI / 2;
-    pLeftFrontWheel.position.set(xContainer * 5 / 14,  -yContainer / 2, zContainer * 5 / 36);
+    pLeftFrontWheel.position.set(xContainer * 5 / 14,  -yContainer / 2, -zContainer * 5 / 36);
     primitives.push(pLeftFrontWheel);
     gContainer.add(pLeftFrontWheel);
 }
