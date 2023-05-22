@@ -17,10 +17,28 @@ var armTranslateIn = false;
 var armTranslateOut = false;
 var rightArmPosition = { x: 0, y: 0, z: 0};
 var leftArmPosition = { x: 0, y: 0, z: 0};
+
+var rotationUnit = Math.PI / 90;
+
+var headRotateDown = false;
+var headRotateUp = false;
+var headRotation = 0;
+
+var thighRotateDown = false;
+var thighRotateUp = false;
+var thighRotation = 0;
+
+var footRotateDown = false;
+var footRotateUp = false;
+var footRotation = 0;
+
 var pRightExhaustPipe, pLeftExhaustPipe, gRightExhaustPipe, gLeftExhaustPipe, pTopRightExhaustPipe, pTopLeftExhaustPipe;
 
 var pRightArm, pRightForearm, pLeftArm, pLeftForearm, pArm, pForearm;
 var gRightArm, gLeftArm, gArm;
+var gHeadRot;
+var gThighRot = new THREE.Object3D();
+var gLeftFootRot, gRightFootRot;
 
 /* Trailer vars */ 
 var trailer;
@@ -147,6 +165,31 @@ function update(){
         leftArmPosition.x += 0.1;
         gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
     }
+
+    if(headRotateDown && headRotation >= -Math.PI) {
+        headRotation -= rotationUnit;
+    }
+    if(headRotateUp && headRotation <= 0) {
+        headRotation += rotationUnit;
+    }
+    gHeadRot.rotation.x = headRotation;
+
+    if (thighRotateDown && thighRotation > 0) {
+        thighRotation -= rotationUnit;
+    }
+    if (thighRotateUp && thighRotation <  Math.PI/2) {
+        thighRotation += rotationUnit;
+    }
+    gThighRot.rotation.x = thighRotation;
+
+    if(footRotateUp && footRotation <= Math.PI/2) {
+        footRotation += rotationUnit;
+    }
+    if(footRotateDown && footRotation >= 0) {
+        footRotation -= rotationUnit;
+    }
+    gLeftFootRot.rotation.x = footRotation;
+    gRightFootRot.rotation.x = footRotation;
 
     // Move trailer
     if(trailerTranslateForward) {
@@ -361,9 +404,12 @@ function createRobotTorso(gAbdomen, yAbdomen) {
 function createRobotHead(gTorso, yTorso, zTorso) {
     'use strict';
 
-    var gHead = new THREE.Object3D();
     var xHead = 4, yHead = 4, zHead = 4;
-    gHead.position.set(0, yTorso / 2 + yHead / 2, zTorso / 5);
+    gHeadRot = new THREE.Object3D();
+    gHeadRot.position.set(0, yTorso / 2, zTorso / 5 - zHead / 2);
+
+    var gHead = new THREE.Object3D();
+    gHead.position.set(0, yHead / 2, zHead / 2);
 
     var pHeadMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: wireframe });
     var pHead = new THREE.Mesh(new THREE.BoxGeometry(xHead, yHead, zHead), pHeadMaterial);
@@ -376,7 +422,8 @@ function createRobotHead(gTorso, yTorso, zTorso) {
     createRobotAntenna(gHead, xHead, yHead, zHead, robotSide.LEFT);
     createRobotAntenna(gHead, xHead, yHead, zHead, robotSide.RIGHT);
 
-    gTorso.add(gHead);
+    gHeadRot.add(gHead);
+    gTorso.add(gHeadRot);
 }
 
 
@@ -503,10 +550,12 @@ function createRobotExhaustPipe(gArm, xArm, yArm, gExhaustPipe, pExhaustPipe, si
 
 function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
     'use strict';
-
-    var gThigh = new THREE.Object3D();
+    
     var xThigh = 2, yThigh = 4, zThigh = 2;
-    gThigh.position.set(side * (3 * xWaist) / 10, -yWaist / 2 - yThigh / 2, -zWaist / 10);
+
+    gThighRot.position.set(0, -yWaist / 2 + 2, -zWaist / 10);
+    var gThigh = new THREE.Object3D();
+    gThigh.position.set(side * (3 * xWaist) / 10, - yThigh / 2 - 2, 0);
 
     var pThighMaterial = new THREE.MeshBasicMaterial({color: colors.PURPLE,wireframe: wireframe });
     var pThigh = new THREE.Mesh(new THREE.BoxGeometry(xThigh, yThigh, zThigh), pThighMaterial);
@@ -516,7 +565,8 @@ function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
 
     createRobotLeg(gThigh, yThigh, side);
 
-    gWaist.add(gThigh);
+    gThighRot.add(gThigh);
+    gWaist.add(gThighRot);
 }
 
 function createRobotLeg(gThigh, yThigh, side) {
@@ -548,25 +598,58 @@ function createRobotLeg(gThigh, yThigh, side) {
     primitives.push(pBottomWheel);
     gLeg.add(pBottomWheel);
 
-    createRobotFoot(gLeg, yLeg, zLeg);
+    createRobotFoot(gLeg, yLeg, zLeg, side);
 
     gThigh.add(gLeg);
 }
 
-function createRobotFoot(gLeg, yLeg, zLeg) {
+function createRobotFoot(gLeg, yLeg, zLeg, side) {
     'use strict';
 
-    var gFoot = new THREE.Object3D();
+    if (side == robotSide.LEFT)
+        createLeftRobotFoot(gLeg, yLeg, zLeg);
+    else
+        createRightRobotFoot(gLeg, yLeg, zLeg);
+}
+
+function createLeftRobotFoot(gLeg, yLeg, zLeg) {
+    'use strict';
+
     var xFoot = 4, yFoot = 2, zFoot = 4;
-    gFoot.position.set(0, - yLeg / 2 - yFoot / 2, zLeg / 2);
 
-    var pFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: wireframe });
-    var pFoot = new THREE.Mesh(new THREE.BoxGeometry(xFoot, yFoot, zFoot), pFootMaterial);
-    pFoot.position.set(0, 0, 0);
-    primitives.push(pFoot);
-    gFoot.add(pFoot);
+    gLeftFootRot = new THREE.Object3D();
+    gLeftFootRot.position.set(0, -yLeg / 2, +zLeg / 2 - zFoot / 2);
+    var gLeftFoot = new THREE.Object3D();
+    gLeftFoot.position.set(0 , - yFoot / 2, + zFoot / 2);
 
-    gLeg.add(gFoot);
+    var pLeftFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: wireframe });
+    var pLeftFoot = new THREE.Mesh(new THREE.BoxGeometry(xFoot, yFoot, zFoot), pLeftFootMaterial);
+    pLeftFoot.position.set(0, 0, 0);
+    primitives.push(pLeftFoot);
+    gLeftFoot.add(pLeftFoot);
+
+    gLeftFootRot.add(gLeftFoot);
+    gLeg.add(gLeftFootRot);
+}
+
+function createRightRobotFoot(gLeg, yLeg, zLeg) {
+    'use strict';
+
+    var xFoot = 4, yFoot = 2, zFoot = 4;
+
+    gRightFootRot = new THREE.Object3D();
+    gRightFootRot.position.set(0, -yLeg / 2, +zLeg / 2 - zFoot / 2);
+    var gRightFoot = new THREE.Object3D();
+    gRightFoot.position.set(0 , - yFoot / 2, + zFoot / 2);
+
+    var pRightFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: wireframe });
+    var pRightFoot = new THREE.Mesh(new THREE.BoxGeometry(xFoot, yFoot, zFoot), pRightFootMaterial);
+    pRightFoot.position.set(0, 0, 0);
+    primitives.push(pRightFoot);
+    gRightFoot.add(pRightFoot);
+
+    gRightFootRot.add(gRightFoot);
+    gLeg.add(gRightFootRot);
 }
 
 // Create Trailer //
@@ -760,7 +843,7 @@ function onKeyDown(e) {
             isUpperCamera = false;
             isOrtogonalCamera = false;
             break;
-        case 53: // 4 - Ortogonal Camera
+        case 53: // 5 - Ortogonal Camera
             isOrtogonalCamera = true;
             isFrontCamera = false;
             isLateralCamera = false;
@@ -773,17 +856,47 @@ function onKeyDown(e) {
                 primitive.material.wireframe = wireframe;
             });
             break;
-        case 69: // 7 - Translate arms into body
+        case 69: // E - Translate Arms Into Body
         case 101:
             armTranslateIn = true;
             break;
-        case 68:
+        case 68: // D - Translate Arms Out of Body
         case 100:
             armTranslateOut = true;
             break;
+
+        case 70: // F - Rotate Head Down
+        case 102:
+            headRotateDown = true;
+            break;
+
+        case 82: // R - Rotate Head Up
+        case 114:
+            headRotateUp = true;
+            break;
+
+        case 83: // S - Rotate Thigh Down
+        case 115:
+            thighRotateDown = true;
+            break;
+        
+        case 87: // W - Rotate Thigh Up
+        case 119:
+            thighRotateUp = true;
+            break;
+            
+        case 81: // Q - Rotate Feet Up
+        case 113:
+            footRotateUp = true;
+            break;
+
+        case 65: // A - Rotate Feet Down
+        case 97:
+            footRotateDown = true;
+            break;
     }
 }
-
+            
 ///////////////////////
 /* KEY UP CALLBACK */
 ///////////////////////
@@ -811,6 +924,36 @@ function onKeyUp(e){
         case 68:
         case 100:
             armTranslateOut = false;
+            break;
+
+        case 70: // F - Rotate Head Down
+        case 102:
+            headRotateDown = false;
+            break;
+
+        case 82: // R - Rotate Head Up
+        case 114:
+            headRotateUp = false;
+            break;
+
+        case 83: // S - Rotate Thigh Down
+        case 115:
+            thighRotateDown = false;
+            break;
+        
+        case 87: // W - Rotate Thigh Up
+        case 119:
+            thighRotateUp = false;
+            break;
+
+        case 81: // Q - Rotate Feet Up
+        case 113:
+            footRotateUp = false;
+            break;
+
+        case 65: // A - Rotate Feet Down
+        case 97:
+            footRotateDown = false;
             break;
     }
 }
