@@ -5,12 +5,22 @@
 var scene, renderer;
 
 /* cameras vars */ var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera, ortogonalCamera;
+var isFrontCamera = false, isUpperCamera = false, isLateralCamera = false, isPerspectiveCamera = true, isOrtogonalCamera = false;
 
 /* Robot */ var robot;
             const primitives = [];
             var wireframe;
 
 /* Trailer */ var trailer;
+
+var armTranslateIn = false;
+var armTranslateOut = false;
+var rightArmPosition = { x: 0, y: 0, z: 0};
+var leftArmPosition = { x: 0, y: 0, z: 0};
+var pRightExhaustPipe, pLeftExhaustPipe, gRightExhaustPipe, gLeftExhaustPipe, pTopRightExhaustPipe, pTopLeftExhaustPipe;
+
+var pRightArm, pRightForearm, pLeftArm, pLeftForearm, pArm, pForearm;
+var gRightArm, gLeftArm, gArm;
 
 const robotSide = {
   RIGHT: -1,
@@ -45,6 +55,35 @@ const colors = {
     NAVY: 0x000080,
 }
 
+////////////////////////////////
+/* INITIALIZE ANIMATION CYCLE */
+////////////////////////////////
+function init() {
+    'use strict';
+
+    renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    wireframe = false;
+
+    createScene();
+
+    createPerspectiveCamera();
+    createFrontCamera();
+    createUpperCamera();
+    createLateralCamera();
+    createOrtogonalCamera();
+
+    camera = perspectiveCamera;
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("resize", onResize);
+    window.addEventListener("keyup", onKeyUp);
+}
+
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
@@ -58,6 +97,74 @@ function createScene(){
     
     createRobot();
     createTrailer();
+}
+
+/////////////////////
+/* ANIMATION CYCLE */
+/////////////////////
+function animate() {
+    'use strict';
+
+    update();
+
+    render();
+
+    requestAnimationFrame(animate);
+}
+
+////////////
+/* UPDATE */
+////////////
+function update(){
+    'use strict';
+    if(isFrontCamera) camera = frontCamera;
+    if(isLateralCamera) camera = lateralCamera;
+    if(isUpperCamera) camera = upperCamera;
+    if(isPerspectiveCamera) camera = perspectiveCamera;
+    if(isOrtogonalCamera) camera = ortogonalCamera;
+
+    if((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) armTranslateOut = false;
+    if((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) armTranslateIn = false;
+    if(leftArmPosition.x - 0.1 < 5.5) armTranslateIn = false;
+    if(armTranslateIn) {
+        rightArmPosition.x += 0.1;
+        gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
+        leftArmPosition.x -= 0.1;
+        gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
+    }
+
+    if(armTranslateOut) {
+        rightArmPosition.x -= 0.1;
+        gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
+        leftArmPosition.x += 0.1;
+        gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
+    }
+    
+}
+
+/////////////
+/* DISPLAY */
+/////////////
+function render() {
+    'use strict';
+    renderer.render(scene, camera);
+
+}
+
+//////////////////////
+/* CHECK COLLISIONS */
+//////////////////////
+function checkCollisions(){
+    'use strict';
+
+}
+
+///////////////////////
+/* HANDLE COLLISIONS */
+///////////////////////
+function handleCollisions(){
+    'use strict';
+
 }
 
 //////////////////////
@@ -224,8 +331,8 @@ function createRobotTorso(gAbdomen, yAbdomen) {
     gTorso.add(pTorso);
 
     createRobotHead(gTorso, yTorso, zTorso);
-    createRobotArm(gTorso, xTorso, zTorso, robotSide.LEFT);
-    createRobotArm(gTorso, xTorso, zTorso, robotSide.RIGHT);
+    createRobotLeftArm(gTorso, xTorso, zTorso, robotSide.LEFT);
+    createRobotRightArm(gTorso, xTorso, zTorso, robotSide.RIGHT);
 
     gAbdomen.add(gTorso);
 }
@@ -287,43 +394,80 @@ function createRobotAntenna(gHead, xHead, yHead, zHead, side) {
     gHead.add(gAntenna);
 }
 
-function createRobotArm(gTorso, xTorso, zTorso, side) {
+function createRobotRightArm(gTorso, xTorso, zTorso, side) {
 
     'use strict';
 
-    var gArm = new THREE.Object3D();
+    gRightArm = new THREE.Object3D();
     var xArm = 3, yArm = 6, zArm = 3;
-    gArm.position.set(side * (xTorso / 2 + xArm / 2), 0, - ( 7 * zTorso) / 20);
+    gRightArm.position.set(side * (xTorso / 2 + xArm / 2), 0, - ( 7 * zTorso) / 20);
 
     var pArmMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: wireframe });
-    var pArm = new THREE.Mesh(new THREE.BoxGeometry(xArm, yArm, zArm), pArmMaterial);
-    pArm.position.set(0, 0, 0);
-    primitives.push(pArm);
-    gArm.add(pArm);
+    pRightArm = new THREE.Mesh(new THREE.BoxGeometry(xArm, yArm, zArm), pArmMaterial);
+    pRightArm.position.set(0, 0, 0);
+    primitives.push(pRightArm);
+    gRightArm.add(pRightArm);
 
     var pForearmMaterial = new THREE.MeshBasicMaterial({color: colors.BLUE,wireframe: wireframe });
     var xForearm = 3, yForearm = 3, zForearm = 10;
-    var pForearm = new THREE.Mesh(new THREE.BoxGeometry(xForearm, yForearm, zForearm), pForearmMaterial);
-    pForearm.position.set(0, -yArm / 2 - yForearm / 2, (7 * zArm) / 6);
-    primitives.push(pForearm);
-    gArm.add(pForearm);
+    pRightForearm = new THREE.Mesh(new THREE.BoxGeometry(xForearm, yForearm, zForearm), pForearmMaterial);
+    pRightForearm.position.set(0, -yArm / 2 - yForearm / 2, (7 * zArm) / 6);
+    primitives.push(pRightForearm);
+    gRightArm.add(pRightForearm);
 
-    createRobotExhaustPipe(gArm, xArm, yArm, side);    
+    rightArmPosition.x = gRightArm.position.x;
+    rightArmPosition.y = gRightArm.position.y;
+    rightArmPosition.z = gRightArm.position.z;
 
-    gTorso.add(gArm);
+    gRightExhaustPipe = new THREE.Object3D();
+    var result = createRobotExhaustPipe(gRightArm, xArm, yArm, gRightExhaustPipe, pRightExhaustPipe, side);
+    pRightExhaustPipe = result[0];
+    pTopRightExhaustPipe = result[1];
 
+    gTorso.add(gRightArm);
 }
 
-function createRobotExhaustPipe(gArm, xArm, yArm, side) {
+function createRobotLeftArm(gTorso, xTorso, zTorso, side) {
+    'use strict';
+
+    gLeftArm = new THREE.Object3D();
+    var xArm = 3, yArm = 6, zArm = 3;
+    gLeftArm.position.set(side * (xTorso / 2 + xArm / 2), 0, - ( 7 * zTorso) / 20);
+
+    var pArmMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: wireframe });
+    pLeftArm = new THREE.Mesh(new THREE.BoxGeometry(xArm, yArm, zArm), pArmMaterial);
+    pLeftArm.position.set(0, 0, 0);
+    primitives.push(pLeftArm);
+    gLeftArm.add(pLeftArm);
+
+    var pForearmMaterial = new THREE.MeshBasicMaterial({color: colors.BLUE,wireframe: wireframe });
+    var xForearm = 3, yForearm = 3, zForearm = 10;
+    pLeftForearm = new THREE.Mesh(new THREE.BoxGeometry(xForearm, yForearm, zForearm), pForearmMaterial);
+    pLeftForearm.position.set(0, -yArm / 2 - yForearm / 2, (7 * zArm) / 6);
+    primitives.push(pLeftForearm);
+    gLeftArm.add(pLeftForearm);
+
+    leftArmPosition.x = gLeftArm.position.x;
+    leftArmPosition.y = gLeftArm.position.y;
+    leftArmPosition.z = gLeftArm.position.z;
+
+    gLeftExhaustPipe = new THREE.Object3D();
+    var result = createRobotExhaustPipe(gLeftArm, xArm, yArm, gLeftExhaustPipe, pLeftExhaustPipe, side);
+    pLeftExhaustPipe = result[0];
+    pTopLeftExhaustPipe = result[1];
+
+    gTorso.add(gLeftArm);
+}
+
+function createRobotExhaustPipe(gArm, xArm, yArm, gExhaustPipe, pExhaustPipe, side) {
 
     'use strict';
 
-    var gExhaustPipe = new THREE.Object3D();
     var radExhaustPipe = 0.5, hExhaustPipe = 5;
     gExhaustPipe.position.set(side * (xArm / 2 + radExhaustPipe / 2), - (yArm / 12), 0);
 
     var pExhaustPipeMaterial = new THREE.MeshBasicMaterial({color: colors.BLACK,wireframe: wireframe });
-    var pExhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(radExhaustPipe, radExhaustPipe, hExhaustPipe), pExhaustPipeMaterial);
+    pExhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(radExhaustPipe, radExhaustPipe, hExhaustPipe), pExhaustPipeMaterial);
     pExhaustPipe.position.set(0, 0, 0);
     primitives.push(pExhaustPipe);
     gExhaustPipe.add(pExhaustPipe);
@@ -333,9 +477,12 @@ function createRobotExhaustPipe(gArm, xArm, yArm, side) {
     var pTopExhaustPipe = new THREE.Mesh(new THREE.CylinderGeometry(radTopExhaustPipe, radTopExhaustPipe, hTopExhaustPipe), pTopExhaustPipeMaterial);
     pTopExhaustPipe.position.set(0, hExhaustPipe / 2 + hTopExhaustPipe / 2, 0);
     primitives.push(pTopExhaustPipe);
+
     gExhaustPipe.add(pTopExhaustPipe);
 
     gArm.add(gExhaustPipe);
+
+    return [pExhaustPipe, pTopExhaustPipe];
 }
 
 function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
@@ -522,6 +669,7 @@ function createContainerBottomMiddle(gContainer, xContainer, yContainer, zContai
 
     gContainer.add(gWheelAxe);
 }
+
 function createContainerBottomBack(gContainer, xContainer, yContainer, zContainer) {
 
     'use strict'
@@ -537,80 +685,6 @@ function createContainerBottomBack(gContainer, xContainer, yContainer, zContaine
     gWheelAxe.add(pWheelAxe);
 
     gContainer.add(gWheelAxe);
-}
-
-//////////////////////
-/* CHECK COLLISIONS */
-//////////////////////
-function checkCollisions(){
-    'use strict';
-
-}
-
-///////////////////////
-/* HANDLE COLLISIONS */
-///////////////////////
-function handleCollisions(){
-    'use strict';
-
-}
-
-////////////
-/* UPDATE */
-////////////
-function update(){
-    'use strict';
-
-}
-
-/////////////
-/* DISPLAY */
-/////////////
-function render() {
-    'use strict';
-    renderer.render(scene, camera);
-
-}
-
-////////////////////////////////
-/* INITIALIZE ANIMATION CYCLE */
-////////////////////////////////
-function init() {
-    'use strict';
-
-    renderer = new THREE.WebGLRenderer({
-        antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    wireframe = false;
-
-    createScene();
-
-    createPerspectiveCamera();
-    createFrontCamera();
-    createUpperCamera();
-    createLateralCamera();
-    createOrtogonalCamera();
-
-    camera = perspectiveCamera;
-
-    render();
-
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("resize", onResize);
-}
-
-/////////////////////
-/* ANIMATION CYCLE */
-/////////////////////
-function animate() {
-    'use strict';
-
-    render();
-
-    requestAnimationFrame(animate);
 }
 
 ////////////////////////////
@@ -636,28 +710,53 @@ function onKeyDown(e) {
     switch (e.keyCode) {
 
         case 49: // 1 - Front Camera
-            camera = frontCamera;
+            isFrontCamera = true;
+            isUpperCamera = false;
+            isLateralCamera = false;
+            isPerspectiveCamera = false;
+            isOrtogonalCamera = false;
             break;
         case 50: // 2 - Lateral Camera
-            camera = lateralCamera;
+            isLateralCamera = true;
+            isFrontCamera = false;
+            isUpperCamera = false;
+            isPerspectiveCamera = false;
+            isOrtogonalCamera = false;
             break;
         case 51: // 3 - Upper Camera
-            camera = upperCamera;
+            isUpperCamera = true;
+            isFrontCamera = false;
+            isLateralCamera = false;
+            isPerspectiveCamera = false;
+            isOrtogonalCamera = false;
             break;
         case 52: // 4 - Perspective Camera
-            camera = perspectiveCamera;
+            isPerspectiveCamera = true;
+            isFrontCamera = false;
+            isLateralCamera = false;
+            isUpperCamera = false;
+            isOrtogonalCamera = false;
             break;
         case 53: // 4 - Ortogonal Camera
-            camera = ortogonalCamera;
+            isOrtogonalCamera = true;
+            isFrontCamera = false;
+            isLateralCamera = false;
+            isUpperCamera = false;
+            isPerspectiveCamera = false;
             break;
-
         case 54: // 6 - Wireframe
-    
-            //robotMaterial.wireframe = !robotMaterial.wireframe;
             wireframe = !wireframe;
             primitives.forEach(primitive => {
                 primitive.material.wireframe = wireframe;
             });
+            break;
+        case 69: // 7 - Translate arms into body
+        case 101:
+            armTranslateIn = true;
+            break;
+        case 68:
+        case 100:
+            armTranslateOut = true;
             break;
     }
 }
@@ -667,5 +766,14 @@ function onKeyDown(e) {
 ///////////////////////
 function onKeyUp(e){
     'use strict';
-
+    switch (e.keyCode) {
+        case 69:
+        case 101:
+            armTranslateIn = false;
+            break;
+        case 68:
+        case 100:
+            armTranslateOut = false;
+            break;
+    }
 }
