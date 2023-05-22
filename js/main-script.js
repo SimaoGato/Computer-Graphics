@@ -4,15 +4,15 @@
 
 var scene, renderer;
 
-/* cameras vars */ var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera, ortogonalCamera;
+/* cameras vars */ 
+var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera, ortogonalCamera;
 var isFrontCamera = false, isUpperCamera = false, isLateralCamera = false, isPerspectiveCamera = true, isOrtogonalCamera = false;
 
-/* Robot */ var robot;
-            const primitives = [];
-            var wireframe;
-
-/* Trailer */ var trailer;
-
+/* Robot vars */ 
+var robot;
+const primitives = [];
+var wireframe;
+            
 var armTranslateIn = false;
 var armTranslateOut = false;
 var rightArmPosition = { x: 0, y: 0, z: 0};
@@ -21,6 +21,15 @@ var pRightExhaustPipe, pLeftExhaustPipe, gRightExhaustPipe, gLeftExhaustPipe, pT
 
 var pRightArm, pRightForearm, pLeftArm, pLeftForearm, pArm, pForearm;
 var gRightArm, gLeftArm, gArm;
+
+/* Trailer vars */ 
+var trailer;
+var trailerPosition = new THREE.Vector3(0, 9.5, -30);
+var trailerTranslateForward = false;
+var trailerTranslateBackward = false;
+var trailerTranslateLeft = false;
+var trailerTranslateRight = false;
+var trailerMovementSpeed = 0.3;
 
 const robotSide = {
   RIGHT: -1,
@@ -139,6 +148,20 @@ function update(){
         leftArmPosition.x += 0.1;
         gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
     }
+
+    // Move trailer
+    if(trailerTranslateForward) {
+        trailer.translateZ(trailerMovementSpeed);
+    }
+    if(trailerTranslateBackward) {
+        trailer.translateZ(-trailerMovementSpeed);
+    }
+    if(trailerTranslateLeft) {
+        trailer.translateX(-trailerMovementSpeed);
+    }
+    if(trailerTranslateRight) {
+        trailer.translateX(trailerMovementSpeed);
+    }
     
 }
 
@@ -246,6 +269,8 @@ function createLateralCamera() {
 /* CREATE OBJECT3D(S) */
 ////////////////////////
 
+// Create Robot //
+
 function createRobot() {
     'use strict';
 
@@ -260,7 +285,6 @@ function createRobot() {
 }
 
 function createRobotWaist(gWaist) {
-
     'use strict';
 
     gWaist = new THREE.Object3D();
@@ -298,7 +322,6 @@ function createRobotWaist(gWaist) {
 }
 
 function createRobotAbdomen(gWaist, yWaist) {
-
     'use strict';
 
     var gAbdomen = new THREE.Object3D();
@@ -317,7 +340,6 @@ function createRobotAbdomen(gWaist, yWaist) {
 }
 
 function createRobotTorso(gAbdomen, yAbdomen) {
-
     'use strict';
 
     var gTorso = new THREE.Object3D();
@@ -338,7 +360,6 @@ function createRobotTorso(gAbdomen, yAbdomen) {
 }
 
 function createRobotHead(gTorso, yTorso, zTorso) {
-
     'use strict';
 
     var gHead = new THREE.Object3D();
@@ -361,7 +382,6 @@ function createRobotHead(gTorso, yTorso, zTorso) {
 
 
 function createRobotEye(gHead, xHead, yHead, zHead, side) {
-
     'use strict'
 
     var  gEye = new THREE.Object3D();
@@ -378,7 +398,6 @@ function createRobotEye(gHead, xHead, yHead, zHead, side) {
 }
 
 function createRobotAntenna(gHead, xHead, yHead, zHead, side) {
-
     'use strict'
 
     var gAntenna = new THREE.Object3D();
@@ -395,7 +414,6 @@ function createRobotAntenna(gHead, xHead, yHead, zHead, side) {
 }
 
 function createRobotRightArm(gTorso, xTorso, zTorso, side) {
-
     'use strict';
 
     gRightArm = new THREE.Object3D();
@@ -460,7 +478,6 @@ function createRobotLeftArm(gTorso, xTorso, zTorso, side) {
 }
 
 function createRobotExhaustPipe(gArm, xArm, yArm, gExhaustPipe, pExhaustPipe, side) {
-
     'use strict';
 
     var radExhaustPipe = 0.5, hExhaustPipe = 5;
@@ -486,7 +503,6 @@ function createRobotExhaustPipe(gArm, xArm, yArm, gExhaustPipe, pExhaustPipe, si
 }
 
 function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
-    
     'use strict';
 
     var gThigh = new THREE.Object3D();
@@ -505,7 +521,6 @@ function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
 }
 
 function createRobotLeg(gThigh, yThigh, side) {
-
     'use strict';
 
     var gLeg = new THREE.Object3D();
@@ -540,7 +555,6 @@ function createRobotLeg(gThigh, yThigh, side) {
 }
 
 function createRobotFoot(gLeg, yLeg, zLeg) {
-
     'use strict';
 
     var gFoot = new THREE.Object3D();
@@ -556,14 +570,15 @@ function createRobotFoot(gLeg, yLeg, zLeg) {
     gLeg.add(gFoot);
 }
 
+// Create Trailer //
+
 function createTrailer() {
-    
     'use strict';
 
     var gContainer;
 
     trailer = new THREE.Object3D();
-    trailer.position.set(0, 9.5, -30);
+    trailer.position.copy(trailerPosition);
 
     createTrailerContainer(gContainer);
 
@@ -571,7 +586,6 @@ function createTrailer() {
 }
 
 function createTrailerContainer(gContainer) {
-
     'use strict'
 
     var gContainer = new THREE.Object3D();
@@ -592,7 +606,6 @@ function createTrailerContainer(gContainer) {
 }
 
 function createWheelAxe(gContainer, xContainer, yContainer, zContainer) {
-    
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -637,7 +650,6 @@ function createWheelAxe(gContainer, xContainer, yContainer, zContainer) {
 }
 
 function createContainerBottomFront(gContainer, xContainer, yContainer, zContainer) {
-
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -654,7 +666,6 @@ function createContainerBottomFront(gContainer, xContainer, yContainer, zContain
 }
 
 function createContainerBottomMiddle(gContainer, xContainer, yContainer, zContainer) {
-
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -671,7 +682,6 @@ function createContainerBottomMiddle(gContainer, xContainer, yContainer, zContai
 }
 
 function createContainerBottomBack(gContainer, xContainer, yContainer, zContainer) {
-
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -708,6 +718,20 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
+
+        // Arrow keys to move trailer
+        case 37: // left arrow
+            trailerTranslateLeft = true;
+            break;
+        case 38: // up arrow
+            trailerTranslateBackward = true;
+            break;
+        case 39: // right arrow
+            trailerTranslateRight = true;
+            break;
+        case 40: // down arrow
+            trailerTranslateForward = true;
+            break;
 
         case 49: // 1 - Front Camera
             isFrontCamera = true;
@@ -766,7 +790,21 @@ function onKeyDown(e) {
 ///////////////////////
 function onKeyUp(e){
     'use strict';
+
     switch (e.keyCode) {
+        // stop movement of trailer with key up of arrow keys
+        case 37:
+            trailerTranslateLeft = false;
+            break;
+        case 38:
+            trailerTranslateBackward = false;
+            break;
+        case 39:
+            trailerTranslateRight = false;
+            break;
+        case 40:
+            trailerTranslateForward = false;
+            break;
         case 69:
         case 101:
             armTranslateIn = false;
