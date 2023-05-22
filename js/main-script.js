@@ -24,7 +24,6 @@ var gRightArm, gLeftArm, gArm;
 
 /* Trailer vars */ 
 var trailer;
-var trailerPosition = new THREE.Vector3(0, 9.5, -30);
 var trailerTranslateForward = false;
 var trailerTranslateBackward = false;
 var trailerTranslateLeft = false;
@@ -578,7 +577,7 @@ function createTrailer() {
     var gContainer;
 
     trailer = new THREE.Object3D();
-    trailer.position.copy(trailerPosition);
+    trailer.position.set(0, 9.5, -30);
 
     createTrailerContainer(gContainer);
 
@@ -624,25 +623,25 @@ function createWheelAxe(gContainer, xContainer, yContainer, zContainer) {
     
     var pRightBackWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pRightBackWheel.rotation.z = Math.PI / 2;
-    pRightBackWheel.position.set(- xWheelAxe / 2, - yWheelAxe / 3, - zWheelAxe / (11 / 3.5));
+    pRightBackWheel.position.set(- xWheelAxe / 2, - yWheelAxe / 6, - zWheelAxe / (11 / 3.5));
     primitives.push(pRightBackWheel);
     gWheelAxe.add(pRightBackWheel);
     
     var pLeftBackWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pLeftBackWheel.rotation.z = Math.PI / 2;
-    pLeftBackWheel.position.set(xWheelAxe / 2, - yWheelAxe / 3, - zWheelAxe / (11 / 3.5));
+    pLeftBackWheel.position.set(xWheelAxe / 2, - yWheelAxe / 6, - zWheelAxe / (11 / 3.5));
     primitives.push(pLeftBackWheel);
     gWheelAxe.add(pLeftBackWheel);
     
     var pRightFrontWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pRightFrontWheel.rotation.z = Math.PI / 2;
-    pRightFrontWheel.position.set(xWheelAxe / 2, - yWheelAxe / 3, zWheelAxe / (11 / 3.5));
+    pRightFrontWheel.position.set(xWheelAxe / 2, - yWheelAxe / 6, zWheelAxe / (11 / 3.5));
     primitives.push(pRightFrontWheel);
     gWheelAxe.add(pRightFrontWheel);
     
     var pLeftFrontWheel = new THREE.Mesh(new THREE.CylinderGeometry(radTopWheel, radBottomWheel, heightWheel), pWheelMaterial);
     pLeftFrontWheel.rotation.z = Math.PI / 2;
-    pLeftFrontWheel.position.set(- xWheelAxe / 2, - yWheelAxe / 3, zWheelAxe / (11 / 3.5));
+    pLeftFrontWheel.position.set(- xWheelAxe / 2, - yWheelAxe / 6, zWheelAxe / (11 / 3.5));
     primitives.push(pLeftFrontWheel);
     gWheelAxe.add(pLeftFrontWheel);
     
