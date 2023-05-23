@@ -18,7 +18,7 @@ var armTranslateOut = false;
 var rightArmPosition = { x: 0, y: 0, z: 0};
 var leftArmPosition = { x: 0, y: 0, z: 0};
 
-var rotationUnit = Math.PI / 90;
+var rotationUnit = Math.PI / 90, translationUnit = 0.064;
 
 var headRotateDown = false;
 var headRotateUp = false;
@@ -153,24 +153,24 @@ function update(){
     if((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) armTranslateIn = false;
     if(leftArmPosition.x - 0.1 < 5.5) armTranslateIn = false;
     if(armTranslateIn) {
-        rightArmPosition.x += 0.1;
+        rightArmPosition.x += translationUnit;
         gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
-        leftArmPosition.x -= 0.1;
+        leftArmPosition.x -= translationUnit;
         gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
     }
 
     if(armTranslateOut) {
-        rightArmPosition.x -= 0.1;
+        rightArmPosition.x -=  translationUnit;
         gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
-        leftArmPosition.x += 0.1;
+        leftArmPosition.x += translationUnit;
         gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
     }
 
-    if(headRotateDown && headRotation >= -Math.PI) {
-        headRotation -= rotationUnit;
+    if(headRotateDown && headRotation > -Math.PI) {
+        headRotation -= rotationUnit * 2;
     }
-    if(headRotateUp && headRotation <= 0) {
-        headRotation += rotationUnit;
+    if(headRotateUp && headRotation < 0) {
+        headRotation += rotationUnit * 2;
     }
     gHeadRot.rotation.x = headRotation;
 
@@ -182,10 +182,10 @@ function update(){
     }
     gThighRot.rotation.x = thighRotation;
 
-    if(footRotateUp && footRotation <= Math.PI/2) {
+    if(footRotateUp && footRotation < Math.PI/2) {
         footRotation += rotationUnit;
     }
-    if(footRotateDown && footRotation >= 0) {
+    if(footRotateDown && footRotation > 0) {
         footRotation -= rotationUnit;
     }
     gLeftFootRot.rotation.x = footRotation;
@@ -673,7 +673,7 @@ function createTrailerContainer(gContainer) {
     var gContainer = new THREE.Object3D();
     var xContainer = 14, yContainer = 13, zContainer = 36;
 
-    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE, wireframe: wireframe });
+    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.DARKGREEN, wireframe: wireframe });
     var pContainer = new THREE.Mesh(new THREE.BoxGeometry(xContainer, yContainer, zContainer), pContainerMaterial);
     pContainer.position.set(0, 0, 0);
     primitives.push(pContainer);
