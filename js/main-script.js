@@ -143,11 +143,21 @@ function animate() {
 ////////////
 function update(){
     'use strict';
-    if(isFrontCamera) camera = frontCamera;
-    if(isLateralCamera) camera = lateralCamera;
-    if(isUpperCamera) camera = upperCamera;
-    if(isPerspectiveCamera) camera = perspectiveCamera;
-    if(isOrtogonalCamera) camera = ortogonalCamera;
+    if(isFrontCamera) {
+        camera = frontCamera;
+    }
+    else if(isLateralCamera) {
+        camera = lateralCamera;
+    }
+    else if(isUpperCamera) {
+        camera = upperCamera;
+    }
+    else if(isPerspectiveCamera) {
+        camera = perspectiveCamera;
+    }
+    else {
+        camera = ortogonalCamera;
+    }
 
     if((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) armTranslateOut = false;
     if((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) armTranslateIn = false;
@@ -681,13 +691,13 @@ function createTrailerContainer(gContainer) {
     
     trailer.add(gContainer);
 
-    createWheelAxe(gContainer, xContainer, yContainer, zContainer);
-    createContainerBottomFront(gContainer, xContainer, yContainer, zContainer);
-    createContainerBottomMiddle(gContainer, xContainer, yContainer, zContainer);
-    createContainerBottomBack(gContainer, xContainer, yContainer, zContainer);
+    createWheelAxe(gContainer, yContainer, zContainer);
+    createContainerBottomFront(gContainer, yContainer);
+    createContainerBottomMiddle(gContainer, yContainer);
+    createContainerBottomBack(gContainer, yContainer);
 }
 
-function createWheelAxe(gContainer, xContainer, yContainer, zContainer) {
+function createWheelAxe(gContainer, yContainer, zContainer) {
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -731,7 +741,7 @@ function createWheelAxe(gContainer, xContainer, yContainer, zContainer) {
     gContainer.add(gWheelAxe);
 }
 
-function createContainerBottomFront(gContainer, xContainer, yContainer, zContainer) {
+function createContainerBottomFront(gContainer, yContainer) {
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -747,7 +757,7 @@ function createContainerBottomFront(gContainer, xContainer, yContainer, zContain
     gContainer.add(gWheelAxe);
 }
 
-function createContainerBottomMiddle(gContainer, xContainer, yContainer, zContainer) {
+function createContainerBottomMiddle(gContainer, yContainer) {
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
@@ -763,7 +773,7 @@ function createContainerBottomMiddle(gContainer, xContainer, yContainer, zContai
     gContainer.add(gWheelAxe);
 }
 
-function createContainerBottomBack(gContainer, xContainer, yContainer, zContainer) {
+function createContainerBottomBack(gContainer, yContainer) {
     'use strict'
     
     var gWheelAxe = new THREE.Object3D();
