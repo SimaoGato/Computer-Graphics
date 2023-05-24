@@ -143,45 +143,56 @@ function animate() {
 ////////////
 function update(){
     'use strict';
-    if(isFrontCamera) {
+    
+    // Set camera
+
+    if (isFrontCamera) {
         camera = frontCamera;
     }
-    else if(isLateralCamera) {
+    else if (isLateralCamera) {
         camera = lateralCamera;
     }
-    else if(isUpperCamera) {
+    else if (isUpperCamera) {
         camera = upperCamera;
     }
-    else if(isPerspectiveCamera) {
+    else if (isPerspectiveCamera) {
         camera = perspectiveCamera;
     }
     else {
         camera = ortogonalCamera;
     }
 
-    if((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) armTranslateOut = false;
-    if((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) armTranslateIn = false;
-    if(leftArmPosition.x - 0.1 < 5.5) armTranslateIn = false;
-    if(armTranslateIn) {
+    // Robot movement
+
+    if ((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) {
+        armTranslateOut = false;
+    }
+    if ((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) {
+        armTranslateIn = false;
+    }
+
+    if (armTranslateIn) {
         rightArmPosition.x += translationUnit;
         gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
         leftArmPosition.x -= translationUnit;
         gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
     }
-
-    if(armTranslateOut) {
+    if (armTranslateOut) {
         rightArmPosition.x -=  translationUnit;
         gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
         leftArmPosition.x += translationUnit;
         gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
     }
 
-    if(headRotateDown && headRotation > -Math.PI) {
+    // Robot rotation
+
+    if (headRotateDown && headRotation > -Math.PI) {
         headRotation -= rotationUnit * 2;
     }
-    if(headRotateUp && headRotation < 0) {
+    if (headRotateUp && headRotation < 0) {
         headRotation += rotationUnit * 2;
     }
+
     gHeadRot.rotation.x = headRotation;
 
     if (thighRotateDown && thighRotation > 0) {
@@ -190,31 +201,34 @@ function update(){
     if (thighRotateUp && thighRotation <  Math.PI/2) {
         thighRotation += rotationUnit;
     }
+    
     gThighRot.rotation.x = thighRotation;
 
-    if(footRotateUp && footRotation < Math.PI/2) {
+    if (footRotateUp && footRotation < Math.PI/2) {
         footRotation += rotationUnit;
     }
-    if(footRotateDown && footRotation > 0) {
+    if (footRotateDown && footRotation > 0) {
         footRotation -= rotationUnit;
     }
+
     gLeftFootRot.rotation.x = footRotation;
     gRightFootRot.rotation.x = footRotation;
 
-    // Move trailer
-    if(trailerTranslateForward) {
+    // Trailer movement
+    
+    if (trailerTranslateForward) {
         trailer.translateZ(trailerMovementSpeed);
     }
-    if(trailerTranslateBackward) {
+    if (trailerTranslateBackward) {
         trailer.translateZ(-trailerMovementSpeed);
     }
-    if(trailerTranslateLeft) {
+    if (trailerTranslateLeft) {
         trailer.translateX(-trailerMovementSpeed);
     }
-    if(trailerTranslateRight) {
+    if (trailerTranslateRight) {
         trailer.translateX(trailerMovementSpeed);
     }
-    
+
 }
 
 /////////////
