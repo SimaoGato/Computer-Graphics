@@ -4,19 +4,27 @@
 
 var scene, renderer;
 
-/* cameras vars */ 
+/* cameras vars */
+
 var camera, frontCamera, upperCamera, lateralCamera, perspectiveCamera, ortogonalCamera;
 var isFrontCamera = false, isUpperCamera = false, isLateralCamera = false, isPerspectiveCamera = true, isOrtogonalCamera = false;
 
-/* Robot vars */ 
+/* Robot vars */
+
 var robot;
-const primitives = [];
 var wireframe;
-            
-var armTranslateIn = false;
-var armTranslateOut = false;
+const primitives = [];
+
+const robotSide = {
+  RIGHT: -1,
+  LEFT: 1,
+};
+
 var rightArmPosition = { x: 0, y: 0, z: 0};
 var leftArmPosition = { x: 0, y: 0, z: 0};
+
+var armTranslateIn = false;
+var armTranslateOut = false;
 
 var rotationUnit = Math.PI / 90, translationUnit = 0.064;
 
@@ -32,26 +40,23 @@ var footRotateDown = false;
 var footRotateUp = false;
 var footRotation = 0;
 
-var pRightExhaustPipe, pLeftExhaustPipe, gRightExhaustPipe, gLeftExhaustPipe, pTopRightExhaustPipe, pTopLeftExhaustPipe;
-
 var pRightArm, pRightForearm, pLeftArm, pLeftForearm, pArm, pForearm;
 var gRightArm, gLeftArm, gArm;
 var gHeadRot;
 var gThighRot = new THREE.Object3D();
 var gLeftFootRot, gRightFootRot;
 
-/* Trailer vars */ 
+/* Trailer vars */
+
 var trailer;
+
 var trailerTranslateForward = false;
 var trailerTranslateBackward = false;
 var trailerTranslateLeft = false;
 var trailerTranslateRight = false;
 var trailerMovementSpeed = 0.3;
 
-const robotSide = {
-  RIGHT: -1,
-  LEFT: 1,
-};
+/* Colors */
 
 const colors = {
     RED: 0xff0000,
@@ -201,7 +206,7 @@ function update(){
     if (thighRotateUp && thighRotation <  Math.PI/2) {
         thighRotation += rotationUnit;
     }
-    
+
     gThighRot.rotation.x = thighRotation;
 
     if (footRotateUp && footRotation < Math.PI/2) {
@@ -355,7 +360,7 @@ function createRobotWaist(gWaist) {
 
     gWaist = new THREE.Object3D();
 
-    var pWaistMaterial = new THREE.MeshBasicMaterial({color: colors.BROWN,wireframe: wireframe });
+    var pWaistMaterial = new THREE.MeshBasicMaterial({color: colors.RED,wireframe: wireframe });
     var xWaist = 10, yWaist = 4, zWaist = 10;
     var pWaist = new THREE.Mesh(new THREE.BoxGeometry(xWaist, yWaist, zWaist), pWaistMaterial);
     
@@ -394,7 +399,7 @@ function createRobotAbdomen(gWaist, yWaist) {
     var xAbdomen = 8, yAbdomen = 3, zAbdomen = 10;
     gAbdomen.position.set(0, yWaist / 2 + yAbdomen / 2, 0);
 
-    var pAbdomenMaterial = new THREE.MeshBasicMaterial({color: colors.ORANGE,wireframe: wireframe });
+    var pAbdomenMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE,wireframe: wireframe });
     var pAbdomen = new THREE.Mesh(new THREE.BoxGeometry(xAbdomen, yAbdomen, zAbdomen), pAbdomenMaterial);
     pAbdomen.position.set(0, 0, 0);
     primitives.push(pAbdomen);
@@ -412,7 +417,7 @@ function createRobotTorso(gAbdomen, yAbdomen) {
     var xTorso = 14, yTorso = 6, zTorso = 10;
     gTorso.position.set(0, yAbdomen / 2 + yTorso / 2, 0);
 
-    var pTorsoMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW,wireframe: wireframe });
+    var pTorsoMaterial = new THREE.MeshBasicMaterial({color: colors.LIGHTGREY,wireframe: wireframe });
     var pTorso = new THREE.Mesh(new THREE.BoxGeometry(xTorso, yTorso, zTorso), pTorsoMaterial);
     pTorso.position.set(0, 0, 0);
     primitives.push(pTorso);
@@ -507,10 +512,10 @@ function createRobotRightArm(gTorso, xTorso, zTorso, side) {
     rightArmPosition.y = gRightArm.position.y;
     rightArmPosition.z = gRightArm.position.z;
 
-    gRightExhaustPipe = new THREE.Object3D();
-    var result = createRobotExhaustPipe(gRightArm, xArm, yArm, gRightExhaustPipe, pRightExhaustPipe, side);
-    pRightExhaustPipe = result[0];
-    pTopRightExhaustPipe = result[1];
+    var gRightExhaustPipe = new THREE.Object3D();
+    var pRightExhaustPipe;
+    
+    createRobotExhaustPipe(gRightArm, xArm, yArm, gRightExhaustPipe, pRightExhaustPipe, side);
 
     gTorso.add(gRightArm);
 }
@@ -539,10 +544,10 @@ function createRobotLeftArm(gTorso, xTorso, zTorso, side) {
     leftArmPosition.y = gLeftArm.position.y;
     leftArmPosition.z = gLeftArm.position.z;
 
-    gLeftExhaustPipe = new THREE.Object3D();
-    var result = createRobotExhaustPipe(gLeftArm, xArm, yArm, gLeftExhaustPipe, pLeftExhaustPipe, side);
-    pLeftExhaustPipe = result[0];
-    pTopLeftExhaustPipe = result[1];
+    var gLeftExhaustPipe = new THREE.Object3D();
+    var pLeftExhaustPipe;
+    
+    createRobotExhaustPipe(gLeftArm, xArm, yArm, gLeftExhaustPipe, pLeftExhaustPipe, side);
 
     gTorso.add(gLeftArm);
 }
@@ -568,8 +573,6 @@ function createRobotExhaustPipe(gArm, xArm, yArm, gExhaustPipe, pExhaustPipe, si
     gExhaustPipe.add(pTopExhaustPipe);
 
     gArm.add(gExhaustPipe);
-
-    return [pExhaustPipe, pTopExhaustPipe];
 }
 
 function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
@@ -581,7 +584,7 @@ function createRobotThigh(gWaist, xWaist, yWaist, zWaist, side) {
     var gThigh = new THREE.Object3D();
     gThigh.position.set(side * (3 * xWaist) / 10, - yThigh / 2 - 2, 0);
 
-    var pThighMaterial = new THREE.MeshBasicMaterial({color: colors.PURPLE,wireframe: wireframe });
+    var pThighMaterial = new THREE.MeshBasicMaterial({color: colors.LIGHTGREY,wireframe: wireframe });
     var pThigh = new THREE.Mesh(new THREE.BoxGeometry(xThigh, yThigh, zThigh), pThighMaterial);
     pThigh.position.set(0, 0, 0);
     primitives.push(pThigh);
@@ -600,7 +603,7 @@ function createRobotLeg(gThigh, yThigh, side) {
     var xLeg = 4, yLeg = 10, zLeg = 4;
     gLeg.position.set(0, -yThigh / 2 - yLeg / 2, 0);
 
-    var pLegMaterial = new THREE.MeshBasicMaterial({color: colors.GREEN,wireframe: wireframe });
+    var pLegMaterial = new THREE.MeshBasicMaterial({color: colors.BLUE,wireframe: wireframe });
     var pLeg = new THREE.Mesh(new THREE.BoxGeometry(side * xLeg, yLeg, zLeg), pLegMaterial);
     pLeg.position.set(0, 0, 0);
     primitives.push(pLeg);
@@ -646,7 +649,7 @@ function createLeftRobotFoot(gLeg, yLeg, zLeg) {
     var gLeftFoot = new THREE.Object3D();
     gLeftFoot.position.set(0 , - yFoot / 2, + zFoot / 2);
 
-    var pLeftFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: wireframe });
+    var pLeftFootMaterial = new THREE.MeshBasicMaterial({color: colors.LIGHTGREY,wireframe: wireframe });
     var pLeftFoot = new THREE.Mesh(new THREE.BoxGeometry(xFoot, yFoot, zFoot), pLeftFootMaterial);
     pLeftFoot.position.set(0, 0, 0);
     primitives.push(pLeftFoot);
@@ -666,7 +669,7 @@ function createRightRobotFoot(gLeg, yLeg, zLeg) {
     var gRightFoot = new THREE.Object3D();
     gRightFoot.position.set(0 , - yFoot / 2, + zFoot / 2);
 
-    var pRightFootMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN,wireframe: wireframe });
+    var pRightFootMaterial = new THREE.MeshBasicMaterial({color: colors.LIGHTGREY,wireframe: wireframe });
     var pRightFoot = new THREE.Mesh(new THREE.BoxGeometry(xFoot, yFoot, zFoot), pRightFootMaterial);
     pRightFoot.position.set(0, 0, 0);
     primitives.push(pRightFoot);
@@ -697,7 +700,7 @@ function createTrailerContainer(gContainer) {
     var gContainer = new THREE.Object3D();
     var xContainer = 14, yContainer = 13, zContainer = 36;
 
-    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.DARKGREEN, wireframe: wireframe });
+    var pContainerMaterial = new THREE.MeshBasicMaterial({color: colors.YELLOW, wireframe: wireframe });
     var pContainer = new THREE.Mesh(new THREE.BoxGeometry(xContainer, yContainer, zContainer), pContainerMaterial);
     pContainer.position.set(0, 0, 0);
     primitives.push(pContainer);
@@ -762,7 +765,7 @@ function createContainerBottomFront(gContainer, yContainer) {
     var xWheelAxe = 14, yWheelAxe = 3, zWheelAxe = 21;
     gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, 7.5);
     
-    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.CYAN, wireframe: wireframe });
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE, wireframe: wireframe });
     var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
     pWheelAxe.position.set(0, 0, 0);
     primitives.push(pWheelAxe);
@@ -778,7 +781,7 @@ function createContainerBottomMiddle(gContainer, yContainer) {
     var xWheelAxe = 14, yWheelAxe = 3, zWheelAxe = 3;
     gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, -8.5);
     
-    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.GREEN, wireframe: wireframe });
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE, wireframe: wireframe });
     var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
     pWheelAxe.position.set(0, 0, 0);
     primitives.push(pWheelAxe);
@@ -794,7 +797,7 @@ function createContainerBottomBack(gContainer, yContainer) {
     var xWheelAxe = 14, yWheelAxe = 3, zWheelAxe = 4;
     gWheelAxe.position.set(0, - yContainer / 2 - yWheelAxe / 2, -16);
     
-    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.RED, wireframe: wireframe });
+    var pWheelAxeMaterial = new THREE.MeshBasicMaterial({color: colors.WHITE, wireframe: wireframe });
     var pWheelAxe = new THREE.Mesh(new THREE.BoxGeometry(xWheelAxe, yWheelAxe, zWheelAxe), pWheelAxeMaterial);
     pWheelAxe.position.set(0, 0, 0);
     primitives.push(pWheelAxe);
@@ -825,20 +828,7 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
 
-        // Arrow keys to move trailer
-        case 37: // left arrow
-            trailerTranslateLeft = true;
-            break;
-        case 38: // up arrow
-            trailerTranslateBackward = true;
-            break;
-        case 39: // right arrow
-            trailerTranslateRight = true;
-            break;
-        case 40: // down arrow
-            trailerTranslateForward = true;
-            break;
-
+        // Camera keys
         case 49: // 1 - Front Camera
             isFrontCamera = true;
             isUpperCamera = false;
@@ -874,12 +864,16 @@ function onKeyDown(e) {
             isUpperCamera = false;
             isPerspectiveCamera = false;
             break;
+        
+        // Wireframe
         case 54: // 6 - Wireframe
             wireframe = !wireframe;
             primitives.forEach(primitive => {
                 primitive.material.wireframe = wireframe;
             });
             break;
+        
+        // Robot Animation
         case 69: // E - Translate Arms Into Body
         case 101:
             armTranslateIn = true;
@@ -888,37 +882,46 @@ function onKeyDown(e) {
         case 100:
             armTranslateOut = true;
             break;
-
         case 70: // F - Rotate Head Down
         case 102:
             headRotateDown = true;
             break;
-
         case 82: // R - Rotate Head Up
         case 114:
             headRotateUp = true;
             break;
-
         case 83: // S - Rotate Thigh Down
         case 115:
             thighRotateDown = true;
             break;
-        
         case 87: // W - Rotate Thigh Up
         case 119:
             thighRotateUp = true;
             break;
-            
         case 81: // Q - Rotate Feet Up
         case 113:
             footRotateUp = true;
             break;
-
         case 65: // A - Rotate Feet Down
         case 97:
             footRotateDown = true;
             break;
+        
+        // Arrow keys to move trailer
+        case 37: // left arrow
+            trailerTranslateLeft = true;
+            break;
+        case 38: // up arrow
+            trailerTranslateBackward = true;
+            break;
+        case 39: // right arrow
+            trailerTranslateRight = true;
+            break;
+        case 40: // down arrow
+            trailerTranslateForward = true;
+            break;
     }
+
 }
             
 ///////////////////////
@@ -928,56 +931,54 @@ function onKeyUp(e){
     'use strict';
 
     switch (e.keyCode) {
-        // stop movement of trailer with key up of arrow keys
-        case 37:
-            trailerTranslateLeft = false;
-            break;
-        case 38:
-            trailerTranslateBackward = false;
-            break;
-        case 39:
-            trailerTranslateRight = false;
-            break;
-        case 40:
-            trailerTranslateForward = false;
-            break;
-        case 69:
+
+        // Stop Robot Animation
+        case 69: // E - Translate Arms Into Body
         case 101:
             armTranslateIn = false;
             break;
-        case 68:
+        case 68: // D - Translate Arms Out of Body
         case 100:
             armTranslateOut = false;
             break;
-
         case 70: // F - Rotate Head Down
         case 102:
             headRotateDown = false;
             break;
-
         case 82: // R - Rotate Head Up
         case 114:
             headRotateUp = false;
             break;
-
         case 83: // S - Rotate Thigh Down
         case 115:
             thighRotateDown = false;
             break;
-        
         case 87: // W - Rotate Thigh Up
         case 119:
             thighRotateUp = false;
             break;
-
         case 81: // Q - Rotate Feet Up
         case 113:
             footRotateUp = false;
             break;
-
         case 65: // A - Rotate Feet Down
         case 97:
             footRotateDown = false;
             break;
+        
+        // Stop movement of trailer
+        case 37: // left arrow
+            trailerTranslateLeft = false;
+            break;
+        case 38: // up arrow
+            trailerTranslateBackward = false;
+            break;
+        case 39: // right arrow
+            trailerTranslateRight = false;
+            break;
+        case 40: // down arrow
+            trailerTranslateForward = false;
+            break;
     }
+
 }
