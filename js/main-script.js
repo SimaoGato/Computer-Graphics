@@ -46,6 +46,22 @@ var gHeadRot;
 var gThighRot = new THREE.Object3D();
 var gLeftFootRot, gRightFootRot;
 
+var isTruck = false;
+var areArmsIn = false;
+var isHeadDown = false;
+var isThighDown = false;
+var isFootUp = false;
+
+var truckWidth = 14;
+var truckHeight = 14;
+var truckLength = 26;
+
+var trailerWidth = 14;
+var trailerHeight = 17;
+var trailerLength = 36;
+
+var isColliding = false;
+
 /* Trailer vars */
 
 var trailer;
@@ -148,92 +164,151 @@ function animate() {
 ////////////
 function update(){
     'use strict';
-    
-    // Set camera
 
-    if (isFrontCamera) {
-        camera = frontCamera;
-    }
-    else if (isLateralCamera) {
-        camera = lateralCamera;
-    }
-    else if (isUpperCamera) {
-        camera = upperCamera;
-    }
-    else if (isPerspectiveCamera) {
-        camera = perspectiveCamera;
+    if(isColliding) {
+        animateCollision();
     }
     else {
-        camera = ortogonalCamera;
-    }
 
-    // Robot movement
+        if(isColliding) {
+            return;
+        }
+        else {
+            if (isFrontCamera) {
+                camera = frontCamera;
+            }
+            else if (isLateralCamera) {
+                camera = lateralCamera;
+            }
+            else if (isUpperCamera) {
+                camera = upperCamera;
+            }
+            else if (isPerspectiveCamera) {
+                camera = perspectiveCamera;
+            }
+            else {
+                camera = ortogonalCamera;
+            }
 
-    if ((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) {
-        armTranslateOut = false;
-    }
-    if ((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) {
-        armTranslateIn = false;
-    }
+            // Robot movement
 
-    if (armTranslateIn) {
-        rightArmPosition.x += translationUnit;
-        gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
-        leftArmPosition.x -= translationUnit;
-        gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
-    }
-    if (armTranslateOut) {
-        rightArmPosition.x -=  translationUnit;
-        gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
-        leftArmPosition.x += translationUnit;
-        gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
-    }
+            if ((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) {
+                armTranslateOut = false;
+            }
+            if ((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) {
+                armTranslateIn = false;
+                areArmsIn = true;
+            }
 
-    // Robot rotation
+            if (armTranslateIn) {
+                areArmsIn = false;
+                rightArmPosition.x += translationUnit;
+                gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
+                leftArmPosition.x -= translationUnit;
+                gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
+            }
+            if (armTranslateOut) {
+                areArmsIn = false;
+                rightArmPosition.x -=  translationUnit;
+                gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
+                leftArmPosition.x += translationUnit;
+                gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
+            }
 
-    if (headRotateDown && headRotation > -Math.PI) {
-        headRotation -= rotationUnit * 2;
-    }
-    if (headRotateUp && headRotation < 0) {
-        headRotation += rotationUnit * 2;
-    }
+            // Robot rotation
 
-    gHeadRot.rotation.x = headRotation;
+            if (headRotateDown) {
+                isHeadDown = false;
+                headRotation -= rotationUnit * 2;
+                if(headRotation < -Math.PI) {
+                    headRotation = -Math.PI;
+                }
+            }
+            if (headRotateUp) {
+                isHeadDown = false;
+                headRotation += rotationUnit * 2;
+                if(headRotation > 0) {
+                    headRotation = 0;
+                }
+            }
 
-    if (thighRotateDown && thighRotation > 0) {
-        thighRotation -= rotationUnit;
-    }
-    if (thighRotateUp && thighRotation <  Math.PI/2) {
-        thighRotation += rotationUnit;
-    }
+            gHeadRot.rotation.x = headRotation;
 
-    gThighRot.rotation.x = thighRotation;
+            console.log(headRotation);
 
-    if (footRotateUp && footRotation < Math.PI/2) {
-        footRotation += rotationUnit;
-    }
-    if (footRotateDown && footRotation > 0) {
-        footRotation -= rotationUnit;
-    }
+            if (headRotation == -Math.PI) {
+                isHeadDown = true;
+            }
 
-    gLeftFootRot.rotation.x = footRotation;
-    gRightFootRot.rotation.x = footRotation;
+            if (thighRotateDown) {
+                isThighDown = false;
+                thighRotation -= rotationUnit;
+                if(thighRotation < 0) {
+                    thighRotation = 0;
+                }
+            }
+            if (thighRotateUp) {
+                isThighDown = false;
+                thighRotation += rotationUnit;
+                if(thighRotation > Math.PI/2) {
+                    thighRotation = Math.PI/2;
+                }
+            }
 
-    // Trailer movement
-    
-    if (trailerTranslateForward) {
-        trailer.translateZ(trailerMovementSpeed);
-    }
-    if (trailerTranslateBackward) {
-        trailer.translateZ(-trailerMovementSpeed);
-    }
-    if (trailerTranslateLeft) {
-        trailer.translateX(-trailerMovementSpeed);
-    }
-    if (trailerTranslateRight) {
-        trailer.translateX(trailerMovementSpeed);
-    }
+            gThighRot.rotation.x = thighRotation;
 
+            if (thighRotation == Math.PI/2) {
+                isThighDown = true;
+            }
+
+            if (footRotateUp) {
+                isFootUp = false;
+                footRotation += rotationUnit;
+                if(footRotation > Math.PI/2) {
+                    footRotation = Math.PI/2;
+                }
+            }
+            if (footRotateDown) {
+                isFootUp = false;
+                footRotation -= rotationUnit;
+                if(footRotation < 0) {
+                    footRotation = 0;
+                }
+            }
+
+            gLeftFootRot.rotation.x = footRotation;
+            gRightFootRot.rotation.x = footRotation;
+
+            if (footRotation == Math.PI/2) {
+                isFootUp = true;
+            }
+
+            // Is truck
+            if(areArmsIn && isHeadDown && isThighDown && isFootUp) {
+                isTruck = true;
+            }
+            else {
+                isTruck = false;
+            }
+
+            // Trailer movement
+            
+            if (trailerTranslateForward) {
+                trailer.translateZ(trailerMovementSpeed);
+            }
+            if (trailerTranslateBackward) {
+                trailer.translateZ(-trailerMovementSpeed);
+            }
+            if (trailerTranslateLeft) {
+                trailer.translateX(-trailerMovementSpeed);
+            }
+            if (trailerTranslateRight) {
+                trailer.translateX(trailerMovementSpeed);
+            }
+
+            detectCollision();
+        }
+    }
 }
 
 /////////////
@@ -251,6 +326,62 @@ function render() {
 function checkCollisions(){
     'use strict';
 
+}
+
+function detectCollision() {
+    'use strict';
+
+    if(isTruck) {
+        var truckPos = robot.position.clone().sub(new THREE.Vector3(0, 0, 8));
+        var truckDim = new THREE.Vector3(truckWidth, truckHeight, truckLength);
+        var trailerPos = trailer.position.clone();
+
+        var trailerDim = new THREE.Vector3(trailerWidth, trailerHeight, trailerLength);
+
+        var truckMin = truckPos.clone().sub(truckDim.clone().divideScalar(2));
+        
+        var truckMax = truckPos.clone().add(truckDim.clone().divideScalar(2));
+        
+        var trailerMin = trailerPos.clone().sub(trailerDim.clone().divideScalar(2));
+        
+        var trailerMax = trailerPos.clone().add(trailerDim.clone().divideScalar(2));
+
+        isColliding = ( 
+            ((truckMin.x <= trailerMin.x && trailerMin.x <= truckMax.x) || (trailerMin.x <= truckMin.x && truckMin.x <= trailerMax.x)) &&
+            ((truckMin.z <= trailerMin.z && trailerMin.z <= truckMax.z) || (trailerMin.z <= truckMin.z && truckMin.z <= trailerMax.z)) 
+            )
+        
+    }
+}
+
+function animateCollision() {
+    if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
+        trailer.position.z -= 0.1;
+        if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
+            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2;
+        }
+    }
+    else if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
+        trailer.position.z += 0.1;
+        if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
+            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2;
+        }
+    }
+    else if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
+        trailer.position.x += 0.1;
+        if(trailer.position.x > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
+            trailer.position.x = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x;
+        }
+    }
+    else if(trailer.position.x > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
+        trailer.position.x -= 0.1;
+        if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
+            trailer.position.x = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x;
+        }
+    }
+    else {
+        isColliding = false;
+    }
 }
 
 ///////////////////////
@@ -300,7 +431,7 @@ function createFrontCamera() {
                                          1000);
     frontCamera.position.x = 0;
     frontCamera.position.y = 0;
-    frontCamera.position.z = 20;
+    frontCamera.position.z = 100;
     frontCamera.lookAt(scene.position);
 }
 
@@ -313,7 +444,7 @@ function createUpperCamera() {
                                          0.1,
                                          1000);
     upperCamera.position.x = 0;
-    upperCamera.position.y = 20;
+    upperCamera.position.y = 100;
     upperCamera.position.z = 0;
     upperCamera.lookAt(scene.position);
 }
@@ -326,7 +457,7 @@ function createLateralCamera() {
                                          window.innerHeight / -25,
                                          0.1,
                                          1000);
-    lateralCamera.position.x = -20;
+    lateralCamera.position.x = -100;
     lateralCamera.position.y = 0;
     lateralCamera.position.z = 0;
     lateralCamera.lookAt(scene.position);
