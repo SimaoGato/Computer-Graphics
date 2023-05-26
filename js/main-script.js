@@ -222,8 +222,6 @@ function update(){
 
             gHeadRot.rotation.x = headRotation;
 
-            console.log(headRotation);
-
             if (headRotation == -Math.PI - 0.5) {
                 isHeadDown = true;
             }
@@ -357,31 +355,19 @@ function checkCollisions() {
 /* HANDLE COLLISIONS */
 ///////////////////////
 function handleCollisions() {
-    if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
-        trailer.position.z -= animationVelocity;
-        if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
-            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2;
-        }
-    }
-    else if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
-        trailer.position.z += animationVelocity;
-        if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
-            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2;
-        }
-    }
-    else if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
-        trailer.position.x += animationVelocity;
-        if(trailer.position.x > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
-            trailer.position.x = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x;
-        }
-    }
-    else if(trailer.position.x > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
-        trailer.position.x -= animationVelocity;
-        if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
-            trailer.position.x = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x;
-        }
+    'use strict';
+
+    var actualTrailerPos = trailer.position.clone().add(new THREE.Vector3(0, 0, trailerLength / 2));
+    var finalTrailerPos = robot.position.clone().sub(new THREE.Vector3(0, 0, 21));
+    finalTrailerPos.y = actualTrailerPos.y;
+
+    var vectorDiff = finalTrailerPos.clone().sub(actualTrailerPos);
+
+    if (Math.abs(vectorDiff.x) > 1 || Math.abs(vectorDiff.y) > 1 || Math.abs(vectorDiff.z) > 1) {
+        trailer.position.add(vectorDiff.normalize().multiplyScalar(animationVelocity));
     }
     else {
+        trailer.position.set(finalTrailerPos.x, finalTrailerPos.y, finalTrailerPos.z - trailerLength / 2);
         isColliding = false;
     }
 }
@@ -395,9 +381,9 @@ function createPerspectiveCamera() {
                                          window.innerWidth / window.innerHeight,
                                          1,
                                          1000);
-    perspectiveCamera.position.x = 20;
-    perspectiveCamera.position.y = 20;
-    perspectiveCamera.position.z = 20;
+    perspectiveCamera.position.x = 40;
+    perspectiveCamera.position.y = 40;
+    perspectiveCamera.position.z = 40;
     perspectiveCamera.lookAt(scene.position);
 }
 
@@ -409,9 +395,9 @@ function createOrtogonalCamera() {
                                          window.innerHeight / -25,
                                          1,
                                          1000);
-    ortogonalCamera.position.x = -20;
-    ortogonalCamera.position.y = -10;
-    ortogonalCamera.position.z = 20;
+    ortogonalCamera.position.x = -80;
+    ortogonalCamera.position.y = -40;
+    ortogonalCamera.position.z = 80;
     ortogonalCamera.lookAt(scene.position);
 }
 
