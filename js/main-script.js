@@ -63,6 +63,7 @@ var trailerLength = 40;
 var animationVelocity = 0.6;
 
 var isColliding = false;
+var collisionEnabled = true;
 
 /* Trailer vars */
 
@@ -168,148 +169,143 @@ function update(){
         camera = ortogonalCamera;
     }
 
-    if(isColliding) {
+    if(!isColliding && !collisionEnabled) {
+        collisionEnabled = true;
+    }
+    if(isColliding && collisionEnabled) {
         handleCollisions();
     }
     else {
 
-        if(isColliding) {
-            return;
+        if ((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) {
+            armTranslateOut = false;
+        }
+        if ((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) {
+            armTranslateIn = false;
+            areArmsIn = true;
+        }
+
+        if (armTranslateIn) {
+            areArmsIn = false;
+            rightArmPosition.x += translationUnit;
+            gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
+            leftArmPosition.x -= translationUnit;
+            gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
+        }
+        if (armTranslateOut) {
+            areArmsIn = false;
+            rightArmPosition.x -=  translationUnit;
+            gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
+            leftArmPosition.x += translationUnit;
+            gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
+        }
+
+        // Robot rotation
+
+        if (headRotateDown) {
+            isHeadDown = false;
+            headRotation -= rotationUnit * 2;
+            if(headRotation < -Math.PI - 0.5) {
+                headRotation = -Math.PI - 0.5;
+            }
+        }
+        if (headRotateUp) {
+            isHeadDown = false;
+            headRotation += rotationUnit * 2;
+            if(headRotation > 0) {
+                headRotation = 0;
+            }
+        }
+
+        gHeadRot.rotation.x = headRotation;
+
+        if (headRotation == -Math.PI - 0.5) {
+            isHeadDown = true;
+        }
+
+        if (thighRotateDown) {
+            isThighDown = false;
+            thighRotation -= rotationUnit;
+            if(thighRotation < 0) {
+                thighRotation = 0;
+            }
+        }
+        if (thighRotateUp) {
+            isThighDown = false;
+            thighRotation += rotationUnit;
+            if(thighRotation > Math.PI/2) {
+                thighRotation = Math.PI/2;
+            }
+        }
+
+        gThighRot.rotation.x = thighRotation;
+
+        if (thighRotation == Math.PI/2) {
+            isThighDown = true;
+        }
+
+        if (footRotateUp) {
+            isFootUp = false;
+            footRotation += rotationUnit;
+            if(footRotation > Math.PI/2) {
+                footRotation = Math.PI/2;
+            }
+        }
+        if (footRotateDown) {
+            isFootUp = false;
+            footRotation -= rotationUnit;
+            if(footRotation < 0) {
+                footRotation = 0;
+            }
+        }
+
+        gLeftFootRot.rotation.x = footRotation;
+        gRightFootRot.rotation.x = footRotation;
+
+        if (footRotation == Math.PI/2) {
+            isFootUp = true;
+        }
+
+        // Is truck
+        if(areArmsIn && isHeadDown && isThighDown && isFootUp) {
+            isTruck = true;
         }
         else {
-
-            // Robot movement
-
-            if ((rightArmPosition.x - 0.1 < -8.5) || (leftArmPosition.x + 0.1 > 8.5)) {
-                armTranslateOut = false;
-            }
-            if ((rightArmPosition.x + 0.1 > -5.5) || ((leftArmPosition.x - 0.1 < 5.5))) {
-                armTranslateIn = false;
-                areArmsIn = true;
-            }
-
-            if (armTranslateIn) {
-                areArmsIn = false;
-                rightArmPosition.x += translationUnit;
-                gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
-                leftArmPosition.x -= translationUnit;
-                gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
-            }
-            if (armTranslateOut) {
-                areArmsIn = false;
-                rightArmPosition.x -=  translationUnit;
-                gRightArm.position.set(rightArmPosition.x, rightArmPosition.y, rightArmPosition.z);
-                leftArmPosition.x += translationUnit;
-                gLeftArm.position.set(leftArmPosition.x, leftArmPosition.y, leftArmPosition.z);
-            }
-
-            // Robot rotation
-
-            if (headRotateDown) {
-                isHeadDown = false;
-                headRotation -= rotationUnit * 2;
-                if(headRotation < -Math.PI - 0.5) {
-                    headRotation = -Math.PI - 0.5;
-                }
-            }
-            if (headRotateUp) {
-                isHeadDown = false;
-                headRotation += rotationUnit * 2;
-                if(headRotation > 0) {
-                    headRotation = 0;
-                }
-            }
-
-            gHeadRot.rotation.x = headRotation;
-
-            if (headRotation == -Math.PI - 0.5) {
-                isHeadDown = true;
-            }
-
-            if (thighRotateDown) {
-                isThighDown = false;
-                thighRotation -= rotationUnit;
-                if(thighRotation < 0) {
-                    thighRotation = 0;
-                }
-            }
-            if (thighRotateUp) {
-                isThighDown = false;
-                thighRotation += rotationUnit;
-                if(thighRotation > Math.PI/2) {
-                    thighRotation = Math.PI/2;
-                }
-            }
-
-            gThighRot.rotation.x = thighRotation;
-
-            if (thighRotation == Math.PI/2) {
-                isThighDown = true;
-            }
-
-            if (footRotateUp) {
-                isFootUp = false;
-                footRotation += rotationUnit;
-                if(footRotation > Math.PI/2) {
-                    footRotation = Math.PI/2;
-                }
-            }
-            if (footRotateDown) {
-                isFootUp = false;
-                footRotation -= rotationUnit;
-                if(footRotation < 0) {
-                    footRotation = 0;
-                }
-            }
-
-            gLeftFootRot.rotation.x = footRotation;
-            gRightFootRot.rotation.x = footRotation;
-
-            if (footRotation == Math.PI/2) {
-                isFootUp = true;
-            }
-
-            // Is truck
-            if(areArmsIn && isHeadDown && isThighDown && isFootUp) {
-                isTruck = true;
-            }
-            else {
-                isTruck = false;
-            }
-
-            // Trailer movement
-            
-            if (trailerTranslateForward && trailerTranslateLeft) {
-                trailer.translateZ(trailerDiagonalMovementSpeed);
-                trailer.translateX(-trailerDiagonalMovementSpeed);
-            }
-            else if (trailerTranslateForward && trailerTranslateRight) {
-                trailer.translateZ(trailerDiagonalMovementSpeed);
-                trailer.translateX(trailerDiagonalMovementSpeed);
-            }
-            else if (trailerTranslateBackward && trailerTranslateLeft) {
-                trailer.translateZ(-trailerDiagonalMovementSpeed);
-                trailer.translateX(-trailerDiagonalMovementSpeed);
-            }
-            else if (trailerTranslateBackward && trailerTranslateRight) {
-                trailer.translateZ(-trailerDiagonalMovementSpeed);
-                trailer.translateX(trailerDiagonalMovementSpeed);
-            }
-            else if (trailerTranslateForward) {
-                trailer.translateZ(trailerMovementSpeed);
-            }
-            else if (trailerTranslateBackward) {
-                trailer.translateZ(-trailerMovementSpeed);
-            }
-            else if (trailerTranslateLeft) {
-                trailer.translateX(-trailerMovementSpeed);
-            }
-            else if (trailerTranslateRight) {
-                trailer.translateX(trailerMovementSpeed);
-            }
-
-            checkCollisions();
+            isTruck = false;
         }
+
+        // Trailer movement
+        
+        if (trailerTranslateForward && trailerTranslateLeft) {
+            trailer.translateZ(trailerDiagonalMovementSpeed);
+            trailer.translateX(-trailerDiagonalMovementSpeed);
+        }
+        else if (trailerTranslateForward && trailerTranslateRight) {
+            trailer.translateZ(trailerDiagonalMovementSpeed);
+            trailer.translateX(trailerDiagonalMovementSpeed);
+        }
+        else if (trailerTranslateBackward && trailerTranslateLeft) {
+            trailer.translateZ(-trailerDiagonalMovementSpeed);
+            trailer.translateX(-trailerDiagonalMovementSpeed);
+        }
+        else if (trailerTranslateBackward && trailerTranslateRight) {
+            trailer.translateZ(-trailerDiagonalMovementSpeed);
+            trailer.translateX(trailerDiagonalMovementSpeed);
+        }
+        else if (trailerTranslateForward) {
+            trailer.translateZ(trailerMovementSpeed);
+        }
+        else if (trailerTranslateBackward) {
+            trailer.translateZ(-trailerMovementSpeed);
+        }
+        else if (trailerTranslateLeft) {
+            trailer.translateX(-trailerMovementSpeed);
+        }
+        else if (trailerTranslateRight) {
+            trailer.translateX(trailerMovementSpeed);
+        }
+
+        checkCollisions();
     }
 }
 
@@ -368,7 +364,7 @@ function handleCollisions() {
     }
     else {
         trailer.position.set(finalTrailerPos.x, finalTrailerPos.y, finalTrailerPos.z - trailerLength / 2);
-        isColliding = false;
+        collisionEnabled = false;
     }
 }
 
