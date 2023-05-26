@@ -58,7 +58,7 @@ var truckLength = 26;
 
 var trailerWidth = 14;
 var trailerHeight = 17;
-var trailerLength = 36;
+var trailerLength = 40;
 
 var animationVelocity = 0.6;
 
@@ -73,6 +73,7 @@ var trailerTranslateBackward = false;
 var trailerTranslateLeft = false;
 var trailerTranslateRight = false;
 var trailerMovementSpeed = 0.3;
+var trailerDiagonalMovementSpeed = Math.sqrt(Math.pow(trailerMovementSpeed, 2) / 2);
 
 /* Colors */
 
@@ -151,8 +152,24 @@ function animate() {
 function update(){
     'use strict';
 
+    if (isFrontCamera) {
+        camera = frontCamera;
+    }
+    else if (isLateralCamera) {
+        camera = lateralCamera;
+    }
+    else if (isUpperCamera) {
+        camera = upperCamera;
+    }
+    else if (isPerspectiveCamera) {
+        camera = perspectiveCamera;
+    }
+    else {
+        camera = ortogonalCamera;
+    }
+
     if(isColliding) {
-        animateCollision();
+        handleCollisions();
     }
     else {
 
@@ -160,21 +177,6 @@ function update(){
             return;
         }
         else {
-            if (isFrontCamera) {
-                camera = frontCamera;
-            }
-            else if (isLateralCamera) {
-                camera = lateralCamera;
-            }
-            else if (isUpperCamera) {
-                camera = upperCamera;
-            }
-            else if (isPerspectiveCamera) {
-                camera = perspectiveCamera;
-            }
-            else {
-                camera = ortogonalCamera;
-            }
 
             // Robot movement
 
@@ -279,20 +281,36 @@ function update(){
 
             // Trailer movement
             
-            if (trailerTranslateForward) {
+            if (trailerTranslateForward && trailerTranslateLeft) {
+                trailer.translateZ(trailerDiagonalMovementSpeed);
+                trailer.translateX(-trailerDiagonalMovementSpeed);
+            }
+            else if (trailerTranslateForward && trailerTranslateRight) {
+                trailer.translateZ(trailerDiagonalMovementSpeed);
+                trailer.translateX(trailerDiagonalMovementSpeed);
+            }
+            else if (trailerTranslateBackward && trailerTranslateLeft) {
+                trailer.translateZ(-trailerDiagonalMovementSpeed);
+                trailer.translateX(-trailerDiagonalMovementSpeed);
+            }
+            else if (trailerTranslateBackward && trailerTranslateRight) {
+                trailer.translateZ(-trailerDiagonalMovementSpeed);
+                trailer.translateX(trailerDiagonalMovementSpeed);
+            }
+            else if (trailerTranslateForward) {
                 trailer.translateZ(trailerMovementSpeed);
             }
-            if (trailerTranslateBackward) {
+            else if (trailerTranslateBackward) {
                 trailer.translateZ(-trailerMovementSpeed);
             }
-            if (trailerTranslateLeft) {
+            else if (trailerTranslateLeft) {
                 trailer.translateX(-trailerMovementSpeed);
             }
-            if (trailerTranslateRight) {
+            else if (trailerTranslateRight) {
                 trailer.translateX(trailerMovementSpeed);
             }
 
-            detectCollision();
+            checkCollisions();
         }
     }
 }
@@ -309,18 +327,13 @@ function render() {
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
-function checkCollisions(){
-    'use strict';
-
-}
-
-function detectCollision() {
+function checkCollisions() {
     'use strict';
 
     if(isTruck) {
         var truckPos = robot.position.clone().sub(new THREE.Vector3(0, 0, 8));
         var truckDim = new THREE.Vector3(truckWidth, truckHeight, truckLength);
-        var trailerPos = trailer.position.clone();
+        var trailerPos = trailer.position.clone().add(new THREE.Vector3(0, 0, 2));
 
         var trailerDim = new THREE.Vector3(trailerWidth, trailerHeight, trailerLength);
 
@@ -337,20 +350,23 @@ function detectCollision() {
             ((truckMin.z <= trailerMin.z && trailerMin.z <= truckMax.z) || (trailerMin.z <= truckMin.z && truckMin.z <= trailerMax.z)) 
             )
         
-    }
-}
-
-function animateCollision() {
-    if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
-        trailer.position.z -= animationVelocity;
-        if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
-            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2;
         }
     }
-    else if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
+    
+///////////////////////
+/* HANDLE COLLISIONS */
+///////////////////////
+function handleCollisions() {
+    if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
+        trailer.position.z -= animationVelocity;
+        if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
+            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2;
+        }
+    }
+    else if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
         trailer.position.z += animationVelocity;
-        if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
-            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2;
+        if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2) {
+            trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 6)).z - truckLength/2 - trailerLength/2;
         }
     }
     else if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
@@ -368,14 +384,6 @@ function animateCollision() {
     else {
         isColliding = false;
     }
-}
-
-///////////////////////
-/* HANDLE COLLISIONS */
-///////////////////////
-function handleCollisions(){
-    'use strict';
-
 }
 
 //////////////////////
@@ -889,6 +897,8 @@ function createContainerBottomFront(gContainer, yContainer) {
     gWheelAxe.add(pWheelAxe);
 
     gContainer.add(gWheelAxe);
+
+    createFifthWheel(gWheelAxe, zWheelAxe);
 }
 
 function createContainerBottomMiddle(gContainer, yContainer) {
@@ -921,6 +931,22 @@ function createContainerBottomBack(gContainer, yContainer) {
     gWheelAxe.add(pWheelAxe);
 
     gContainer.add(gWheelAxe);
+}
+
+function createFifthWheel(gWheelAxe, zWheelAxe) {
+    'use strict'
+
+    var gFifthWheel = new THREE.Object3D();
+    var xFifthWheel = 4, yFifthWheel = 2, zFifthWheel = 4;
+    gFifthWheel.position.set(0, - yFifthWheel / 4, zWheelAxe / 2 + zFifthWheel / 2);
+
+    var pFifthWheelMaterial = new THREE.MeshBasicMaterial({color: colors.LIGHTGREY, wireframe: wireframe });
+    var pFifthWheel = new THREE.Mesh(new THREE.BoxGeometry(xFifthWheel, yFifthWheel, zFifthWheel), pFifthWheelMaterial);
+    pFifthWheel.position.set(0, 0, 0);
+    primitives.push(pFifthWheel);
+    gFifthWheel.add(pFifthWheel);
+
+    gWheelAxe.add(gFifthWheel);
 }
 
 ////////////////////////////
