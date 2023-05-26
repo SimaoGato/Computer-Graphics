@@ -52,13 +52,15 @@ var isHeadDown = false;
 var isThighDown = false;
 var isFootUp = false;
 
-var truckWidth = 14;
+var truckWidth = 16;
 var truckHeight = 14;
 var truckLength = 26;
 
 var trailerWidth = 14;
 var trailerHeight = 17;
 var trailerLength = 36;
+
+var animationVelocity = 0.6;
 
 var isColliding = false;
 
@@ -76,30 +78,15 @@ var trailerMovementSpeed = 0.3;
 
 const colors = {
     RED: 0xff0000,
-    GREEN: 0x00ff00,
     BLUE: 0x0000ff,
     WHITE: 0xffffff,
     BLACK: 0x000000,
     GREY: 0x404040,
     YELLOW: 0xffff00,
-    ORANGE: 0xffa500,
-    BROWN: 0x8b4513,
-    PURPLE: 0x800080,
     PINK: 0xffc0cb,
     CYAN: 0x00ffff,
-    LIME: 0x00ff00,
-    MAGENTA: 0xff00ff,
     SILVER: 0xc0c0c0,
-    GOLD: 0xffd700,
-    MAROON: 0x800000,
-    OLIVE: 0x808000,
-    DARKGREEN: 0x006400,
-    DARKBLUE: 0x00008b,
-    DARKGREY: 0x696969,
     LIGHTGREY: 0xd3d3d3,
-    CRIMSON: 0xdc143c,
-    CORAL: 0xff7f50,
-    NAVY: 0x000080,
 }
 
 ////////////////////////////////
@@ -139,8 +126,7 @@ function createScene(){
 
     scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(colors.GREY);
-    scene.add(new THREE.AxisHelper(10));
+    scene.background = new THREE.Color(colors.CYAN);
     
     createRobot();
     createTrailer();
@@ -220,8 +206,8 @@ function update(){
             if (headRotateDown) {
                 isHeadDown = false;
                 headRotation -= rotationUnit * 2;
-                if(headRotation < -Math.PI) {
-                    headRotation = -Math.PI;
+                if(headRotation < -Math.PI - 0.5) {
+                    headRotation = -Math.PI - 0.5;
                 }
             }
             if (headRotateUp) {
@@ -236,7 +222,7 @@ function update(){
 
             console.log(headRotation);
 
-            if (headRotation == -Math.PI) {
+            if (headRotation == -Math.PI - 0.5) {
                 isHeadDown = true;
             }
 
@@ -356,25 +342,25 @@ function detectCollision() {
 
 function animateCollision() {
     if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
-        trailer.position.z -= 0.1;
+        trailer.position.z -= animationVelocity;
         if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
             trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2;
         }
     }
     else if(trailer.position.z < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
-        trailer.position.z += 0.1;
+        trailer.position.z += animationVelocity;
         if(trailer.position.z > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2) {
             trailer.position.z = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).z - truckLength/2 - trailerLength/2;
         }
     }
     else if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
-        trailer.position.x += 0.1;
+        trailer.position.x += animationVelocity;
         if(trailer.position.x > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
             trailer.position.x = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x;
         }
     }
     else if(trailer.position.x > robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
-        trailer.position.x -= 0.1;
+        trailer.position.x -= animationVelocity;
         if(trailer.position.x < robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x) {
             trailer.position.x = robot.position.clone().sub(new THREE.Vector3(0, 0, 8)).x;
         }
@@ -1013,13 +999,13 @@ function onKeyDown(e) {
         case 100:
             armTranslateOut = true;
             break;
-        case 70: // F - Rotate Head Down
+        case 70: // F - Rotate Head Up
         case 102:
-            headRotateDown = true;
-            break;
-        case 82: // R - Rotate Head Up
-        case 114:
             headRotateUp = true;
+            break;
+        case 82: // R - Rotate Head DOwn
+        case 114:
+            headRotateDown = true;
             break;
         case 83: // S - Rotate Thigh Down
         case 115:
@@ -1072,13 +1058,13 @@ function onKeyUp(e){
         case 100:
             armTranslateOut = false;
             break;
-        case 70: // F - Rotate Head Down
+        case 70: // F - Rotate Head Up
         case 102:
-            headRotateDown = false;
-            break;
-        case 82: // R - Rotate Head Up
-        case 114:
             headRotateUp = false;
+            break;
+        case 82: // R - Rotate Head Down
+        case 114:
+            headRotateDown = false;
             break;
         case 83: // S - Rotate Thigh Down
         case 115:
