@@ -13,6 +13,7 @@ var isFrontCamera = false, isUpperCamera = false, isLateralCamera = false, isPer
 
 var robot;
 var wireframe;
+var wireframeSwitch = false;
 const primitives = [];
 
 const robotSide = {
@@ -56,14 +57,10 @@ var truckWidth = 16;
 var truckHeight = 14;
 var truckLength = 26;
 
-var trailerWidth = 14;
-var trailerHeight = 17;
-var trailerLength = 40;
-
-var animationVelocity = 0.6;
-
 var isColliding = false;
 var collisionEnabled = true;
+
+var animationVelocity = 0.6;
 
 /* Trailer vars */
 
@@ -75,6 +72,9 @@ var trailerTranslateLeft = false;
 var trailerTranslateRight = false;
 var trailerMovementSpeed = 0.3;
 var trailerDiagonalMovementSpeed = Math.sqrt(Math.pow(trailerMovementSpeed, 2) / 2);
+var trailerWidth = 14;
+var trailerHeight = 17;
+var trailerLength = 40;
 
 /* Colors */
 
@@ -167,6 +167,14 @@ function update(){
     }
     else {
         camera = ortogonalCamera;
+    }
+
+    if(wireframeSwitch) {
+        wireframe = !wireframe;
+        primitives.forEach(primitive => {
+            primitive.material.wireframe = wireframe;
+        });
+        wireframeSwitch = false;
     }
 
     if(!isColliding && !collisionEnabled) {
@@ -327,16 +335,14 @@ function checkCollisions() {
     if(isTruck) {
         var truckPos = robot.position.clone().sub(new THREE.Vector3(0, 0, 8));
         var truckDim = new THREE.Vector3(truckWidth, truckHeight, truckLength);
-        var trailerPos = trailer.position.clone().add(new THREE.Vector3(0, 0, 2));
 
+        var trailerPos = trailer.position.clone().add(new THREE.Vector3(0, 0, 2));
         var trailerDim = new THREE.Vector3(trailerWidth, trailerHeight, trailerLength);
 
         var truckMin = truckPos.clone().sub(truckDim.clone().divideScalar(2));
-        
         var truckMax = truckPos.clone().add(truckDim.clone().divideScalar(2));
-        
-        var trailerMin = trailerPos.clone().sub(trailerDim.clone().divideScalar(2));
-        
+
+        var trailerMin = trailerPos.clone().sub(trailerDim.clone().divideScalar(2));        
         var trailerMax = trailerPos.clone().add(trailerDim.clone().divideScalar(2));
 
         isColliding = ( 
@@ -344,8 +350,8 @@ function checkCollisions() {
             ((truckMin.z <= trailerMin.z && trailerMin.z <= truckMax.z) || (trailerMin.z <= truckMin.z && truckMin.z <= trailerMax.z)) 
             )
         
-        }
     }
+}
     
 ///////////////////////
 /* HANDLE COLLISIONS */
@@ -438,10 +444,6 @@ function createLateralCamera() {
     lateralCamera.position.z = 0;
     lateralCamera.lookAt(scene.position);
 }
-
-/////////////////////
-/* CREATE LIGHT(S) */
-/////////////////////
 
 ////////////////////////
 /* CREATE OBJECT3D(S) */
@@ -991,11 +993,8 @@ function onKeyDown(e) {
             break;
         
         // Wireframe
-        case 54: // 6 - Wireframe
-            wireframe = !wireframe;
-            primitives.forEach(primitive => {
-                primitive.material.wireframe = wireframe;
-            });
+        case 54: // 6 - Wireframe On/Off
+            wireframeSwitch = true;
             break;
         
         // Robot Animation
