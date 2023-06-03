@@ -9,6 +9,9 @@ var floralFieldTexture = createFloralFieldTexture();
 // Create the starry sky texture
 var starryTexture = createStarrySkyTexture();
 
+// MOON Light
+var directionalLight;
+
 ////////////////////////////////
 /* INITIALIZE ANIMATION CYCLE */
 ////////////////////////////////
@@ -49,7 +52,8 @@ function createScene(){
     
     createFloralField();
     createSkydome();
-    createLight();
+    createMoon();
+    //createLight();
 }
 
 function createFloralField() {
@@ -185,6 +189,31 @@ function createLight() {
     scene.add( light );
 }
 
+function createMoon() {
+    'use strict'
+
+    var moonYellowColor = 0xf5e38d;
+
+    // Create the moon
+    var moonGeometry = new THREE.SphereGeometry(10, 32, 32);
+    var moonMaterial = new THREE.MeshBasicMaterial({
+        color: moonYellowColor
+    });
+    var moon = new THREE.Mesh(moonGeometry, moonMaterial);
+    moon.position.set(40, 80, -30);
+    scene.add(moon);
+
+    // Create the directional light
+    directionalLight = new THREE.DirectionalLight(moonYellowColor, 0.5);
+    directionalLight.position.set(1, 1, 1);
+    directionalLight.rotateX(Math.PI / 4);
+    scene.add(directionalLight);
+
+    // Create the ambient light
+    var ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
+}
+
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
@@ -259,6 +288,11 @@ function onKeyDown(e) {
             camera.position.set(0, sceneRadius * 0.1, sceneRadius);
             var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
             camera.lookAt(pos);
+            break;
+        // letter d or D
+        case 68:
+        case 100:
+            directionalLight.visible = !directionalLight.visible;
             break;
     }
 
