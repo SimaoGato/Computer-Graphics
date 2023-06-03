@@ -3,9 +3,21 @@
 //////////////////////
 
 var scene, camera, renderer;
-var texture1, texture2;
-var terrain, material, geometry;
-var currentTexture = 1;
+
+var plane;
+
+const loader = new THREE.TextureLoader();
+const height = loader.load('js/heightmap.png');
+
+// Create the floral field texture
+var texture1 = createFloralFieldTexture();
+texture1.wrapS = THREE.RepeatWrapping;
+texture1.wrapT = THREE.RepeatWrapping;
+
+// Create the starry sky texture
+var texture2 = createStarrySkyTexture();
+texture2.wrapS = THREE.RepeatWrapping;
+texture2.wrapT = THREE.RepeatWrapping;
 
 
 /////////////////////
@@ -16,14 +28,49 @@ function createScene(){
 
     scene = new THREE.Scene();
 
+    scene.add(new THREE.AxisHelper(10));
+
+    const geometry = new THREE.CircleGeometry(2.75, 100);
+
+    const material = new THREE.MeshStandardMaterial({
+        color : 'gray',
+        map: texture1,
+        displacementMap: height,
+        displacementScale: 1.5,
+    });
+    plane = new THREE.Mesh(geometry, material);
+    plane.position.x = 0;
+    plane.position.y = 0;
+    plane.position.z = 0;
+    scene.add(plane);
+    plane.rotation.x = Math.PI * -0.5;
+
+    const skydomeGeometry = new THREE.SphereGeometry(2.75, 100, 100, 0, Math.PI, 0, Math.PI * 0.5);
+    const skydomeMaterial = new THREE.MeshStandardMaterial({
+        map: texture2,
+        side: THREE.BackSide,
+    });
+    const skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial);
+    skydome.position.x = 0;
+    skydome.position.y = 0;
+    skydome.position.z = 0.73;
+    scene.add(skydome);
+    skydome.rotation.x = Math.PI * -0.5;
+
+    const pointLight = new THREE.PointLight(0xffffff, 2);
+    pointLight.position.x = 0;
+    pointLight.position.y = 2;
+    pointLight.position.z = 2;
+    scene.add(pointLight);
+
 }
 
 function createFloralFieldTexture() {
     'use strict';
 
     var canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     var context = canvas.getContext('2d');
 
@@ -33,7 +80,7 @@ function createFloralFieldTexture() {
 
     // Draw the flowers
     var colors = ['#ffffff', '#ffff00', '#c8a2c8', '#add8e6'];
-    for (var i = 0; i < 500; i++) {
+    for (var i = 0; i < 750; i++) {
         var x = Math.random() * canvas.width;
         var y = Math.random() * canvas.height;
         var radius = Math.random() * 5 + 2;
@@ -55,8 +102,8 @@ function createStarrySkyTexture() {
     'use strict';
 
     var canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 512;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     var context = canvas.getContext('2d');
 
@@ -69,7 +116,7 @@ function createStarrySkyTexture() {
 
     // Draw the stars
     context.fillStyle = '#ffffff';
-    for (var i = 0; i < 500; i++) {
+    for (var i = 0; i < 750; i++) {
         var x = Math.random() * canvas.width;
         var y = Math.random() * canvas.height;
         var radius = Math.random() * 2 + 1;
@@ -138,7 +185,6 @@ function render() {
 function init() {
     'use strict';
 
-    // Create the renderer
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
@@ -147,27 +193,16 @@ function init() {
 
     createScene();
 
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.x = 0;
+    camera.position.y = 1;
+    camera.position.z = 4.74;
 
-    // Create the floral field texture
-    texture1 = createFloralFieldTexture();
-    texture1.wrapS = THREE.RepeatWrapping;
-    texture1.wrapT = THREE.RepeatWrapping;
+    camera.lookAt(scene.position);
 
-    // Create the starry sky texture
-    texture2 = createStarrySkyTexture();
-    texture2.wrapS = THREE.RepeatWrapping;
-    texture2.wrapT = THREE.RepeatWrapping;
+    scene.add(camera);
 
-    // Create the terrain mesh
-    geometry = new THREE.PlaneGeometry(10, 10, 10, 10);
-    material = new THREE.MeshBasicMaterial({ map: texture1 });
-    terrain = new THREE.Mesh(geometry, material);
-    scene.add(terrain);
 
-    window.addEventListener("resize", onResize);
-    window.addEventListener("keydown", onKeyDown);
 }
 
 /////////////////////
@@ -196,7 +231,7 @@ function onResize() {
 function onKeyDown(e) {
     'use strict';
 
-    switch (e.keyCode) {
+    /*switch (e.keyCode) {
         case 49: // 1
             terrain.material.map = texture1;
             currentTexture = 1;
@@ -205,7 +240,7 @@ function onKeyDown(e) {
             terrain.material.map = texture2;
             currentTexture = 2;
             break;
-    }
+    }*/
 
 }
 
