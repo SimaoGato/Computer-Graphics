@@ -1,68 +1,90 @@
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-
 var scene, camera, renderer;
-
-var plane;
-
-const loader = new THREE.TextureLoader();
-const height = loader.load('js/heightmap.png');
+var plane, sceneRadius = 100;
 
 // Create the floral field texture
-var texture1 = createFloralFieldTexture();
-texture1.wrapS = THREE.RepeatWrapping;
-texture1.wrapT = THREE.RepeatWrapping;
-
+var floralFieldTexture = createFloralFieldTexture();
 // Create the starry sky texture
-var texture2 = createStarrySkyTexture();
-texture2.wrapS = THREE.RepeatWrapping;
-texture2.wrapT = THREE.RepeatWrapping;
+var starryTexture = createStarrySkyTexture();
 
+////////////////////////////////
+/* INITIALIZE ANIMATION CYCLE */
+////////////////////////////////
+function init() {
+    'use strict';
+
+    renderer = new THREE.WebGLRenderer({
+        antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    
+    createScene();
+    createCamera();
+    
+    window.addEventListener("keydown", onKeyDown);
+}
+
+/////////////////////
+/* ANIMATION CYCLE */
+/////////////////////
+function animate() {
+    'use strict';
+    
+    render();
+    requestAnimationFrame(animate);   
+}
 
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
 function createScene(){
     'use strict';
-
+    
     scene = new THREE.Scene();
-
+    
     scene.add(new THREE.AxisHelper(10));
+    
+    createFloralField();
+    createSkydome();
+    createLight();
+}
 
-    const geometry = new THREE.CircleGeometry(2.75, 100);
+function createFloralField() {
+    'use strict'
 
+    const loader = new THREE.TextureLoader();
+    const height = loader.load('js/heightmap.png');
+
+    const geometry = new THREE.CircleGeometry(sceneRadius, 100);
     const material = new THREE.MeshStandardMaterial({
         color : 'gray',
-        map: texture1,
+        map: floralFieldTexture,
         displacementMap: height,
-        displacementScale: 1.5,
+        displacementScale: 2,
     });
-    plane = new THREE.Mesh(geometry, material);
-    plane.position.x = 0;
-    plane.position.y = 0;
-    plane.position.z = 0;
-    scene.add(plane);
-    plane.rotation.x = Math.PI * -0.5;
 
-    const skydomeGeometry = new THREE.SphereGeometry(2.75, 100, 100, 0, Math.PI, 0, Math.PI * 0.5);
+    plane = new THREE.Mesh(geometry, material);
+    plane.position.set(0, -0.4, 0);
+    plane.rotation.x = Math.PI * -0.5;
+    scene.add(plane);
+}
+
+function createSkydome() {
+    'use strict';
+    
+    const skydomeGeometry = new THREE.SphereGeometry(sceneRadius, 64, 32, 0, Math.PI , 0, Math.PI / 1.7);
     const skydomeMaterial = new THREE.MeshStandardMaterial({
-        map: texture2,
-        side: THREE.BackSide,
+        map: starryTexture,
+        side: THREE.BackSide
     });
+
     const skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial);
-    skydome.position.x = 0;
-    skydome.position.y = 0;
-    skydome.position.z = 0.73;
+    skydome.position.set(0, 0, 0);
     scene.add(skydome);
     skydome.rotation.x = Math.PI * -0.5;
-
-    const pointLight = new THREE.PointLight(0xffffff, 2);
-    pointLight.position.x = 0;
-    pointLight.position.y = 2;
-    pointLight.position.z = 2;
-    scene.add(pointLight);
-
 }
 
 function createFloralFieldTexture() {
@@ -94,6 +116,9 @@ function createFloralFieldTexture() {
 
     var texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
+
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
 
     return texture;
 }
@@ -129,17 +154,36 @@ function createStarrySkyTexture() {
     var texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
 
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
     return texture;
 }
 
 //////////////////////
 /* CREATE CAMERA(S) */
 //////////////////////
+function createCamera(){
+    'use strict';
 
+    camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(- sceneRadius * 0.9, sceneRadius * 1.3, sceneRadius * 1.3);
+    camera.lookAt(scene.position);
+    
+    scene.add(camera);
+}
 
 /////////////////////
 /* CREATE LIGHT(S) */
 /////////////////////
+function createLight() {
+    // const pointLight = new THREE.PointLight(0xffffff, 2);
+    // pointLight.position.set(10, 10, 10);
+    // scene.add(pointLight); 
+    
+    const light = new THREE.AmbientLight(0xffffff, 2); // soft white light
+    scene.add( light );
+}
 
 ////////////////////////
 /* CREATE OBJECT3D(S) */
@@ -158,7 +202,7 @@ function checkCollisions(){
 ///////////////////////
 function handleCollisions(){
     'use strict';
-
+    
 }
 
 ////////////
@@ -166,7 +210,7 @@ function handleCollisions(){
 ////////////
 function update(){
     'use strict';
-
+    
 }
 
 /////////////
@@ -174,48 +218,11 @@ function update(){
 /////////////
 function render() {
     'use strict';
-
+    
     renderer.render(scene, camera);
-
+    
 }
 
-////////////////////////////////
-/* INITIALIZE ANIMATION CYCLE */
-////////////////////////////////
-function init() {
-    'use strict';
-
-    renderer = new THREE.WebGLRenderer({
-        antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    createScene();
-
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.x = 0;
-    camera.position.y = 1;
-    camera.position.z = 4.74;
-
-    camera.lookAt(scene.position);
-
-    scene.add(camera);
-
-
-}
-
-/////////////////////
-/* ANIMATION CYCLE */
-/////////////////////
-function animate() {
-    'use strict';
-
-    render();
-
-    requestAnimationFrame(animate);
-
-}
 
 ////////////////////////////
 /* RESIZE WINDOW CALLBACK */
@@ -231,16 +238,29 @@ function onResize() {
 function onKeyDown(e) {
     'use strict';
 
-    /*switch (e.keyCode) {
+    switch (e.keyCode) {
         case 49: // 1
-            terrain.material.map = texture1;
+            terrain.material.map = floralFieldTexture;
             currentTexture = 1;
             break;
         case 50: // 2   
-            terrain.material.map = texture2;
+            terrain.material.map = starryTexture;
             currentTexture = 2;
             break;
-    }*/
+        case 51: // 3
+            camera.position.set(- sceneRadius * 0.9, sceneRadius * 1.3, sceneRadius * 1.3);
+            camera.lookAt(scene.position);
+            break;
+        case 52: // 4
+            camera.position.set(0, sceneRadius * 2, 0);
+            camera.lookAt(scene.position);
+            break;
+        case 53: // 5
+            camera.position.set(0, sceneRadius * 0.1, sceneRadius);
+            var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
+            camera.lookAt(pos);
+            break;
+    }
 
 }
 
