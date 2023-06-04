@@ -54,6 +54,7 @@ function createScene(){
     createSkydome();
     createMoon();
     //createLight();
+    createThree(new THREE.Vector3(0, 0, 0));
 }
 
 function createFloralField() {
@@ -73,6 +74,14 @@ function createFloralField() {
     plane = new THREE.Mesh(geometry, material);
     plane.position.set(0, -0.4, 0);
     plane.rotation.x = Math.PI * -0.5;
+
+    var defaultRotation = Math.PI / 360;
+    var defaultHeight = 1;
+    createThree(new THREE.Vector3(0, 0, -60), defaultRotation, defaultHeight);
+    createThree(new THREE.Vector3(-30, 0, -30), 100 * defaultRotation, 1.5 * defaultHeight);
+    createThree(new THREE.Vector3(40, 0, -30), 200 * defaultRotation, 0.5 * defaultHeight);
+    createThree(new THREE.Vector3(-35, 0, 40), 150 * defaultRotation, 0.75 * defaultHeight);
+    createThree(new THREE.Vector3(20, 0, 50), 40 * defaultRotation, 1.25 * defaultHeight);
     scene.add(plane);
 }
 
@@ -217,6 +226,54 @@ function createMoon() {
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
+
+function createThree(pos, rot, heightScale) {
+    'use strict';
+
+    var threeBrownOrangeColor = 0x8B4513;
+    var threeLeafColor = 0x228B22;
+
+    var threeBranchMaterial = new THREE.MeshBasicMaterial({ color: threeBrownOrangeColor });
+    var threeLeafMaterial = new THREE.MeshBasicMaterial({ color: threeLeafColor });
+
+    function createBranch(matrix) {
+        'use strict';
+        var branchGeometry = new THREE.CylinderGeometry(0.8, 0.8, heightScale * 20, 32);
+        var pBranch = new THREE.Mesh(branchGeometry, threeBranchMaterial);
+        pBranch.position.set(0, heightScale * 10, 0);
+    
+        var pLeafGeometry = new THREE.SphereGeometry(heightScale * 8, 32, 32);
+        var pLeaf = new THREE.Mesh(pLeafGeometry, threeLeafMaterial);
+        pLeaf.scale.set(1, 0.6, 1);
+        pLeaf.position.set(0, heightScale * 22, 0);
+    
+        matrix.add(pBranch);
+        matrix.add(pLeaf);
+    }
+
+    var three = new THREE.Object3D();
+    three.position.set(pos.x,pos.y + 0.3,pos.z);
+    three.rotation.y = rot;
+
+    var mainBranch = new THREE.Object3D();
+    createBranch(mainBranch);
+    mainBranch.rotation.z = Math.PI/7;
+
+    var secondaryBranch = new THREE.Object3D();
+    createBranch(secondaryBranch);
+    secondaryBranch.position.set(0, heightScale * 2,0);
+    secondaryBranch.rotation.z = - Math.PI/3;
+    secondaryBranch.scale.set(0.8,0.8,0.8);
+    mainBranch.add(secondaryBranch);
+
+    var baseThreeGeometry = new THREE.CylinderGeometry(0.72, 0.72, 0.7, 32);
+    var baseThree = new THREE.Mesh(baseThreeGeometry, threeBranchMaterial);
+    baseThree.position.set(0, -0.05, 0);
+    three.add(baseThree);
+
+    three.add(mainBranch);
+    scene.add(three);
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
