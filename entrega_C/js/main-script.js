@@ -21,6 +21,330 @@ materialOptionsArray = [];
 var materialSwitch = false;
 var currentMaterial = 0;
 
+// House Components
+
+const wallVertices = [
+    // Front face
+    -62.5, 0, 30,
+    62.5, 0, 30,
+    62.5, 35, 30,
+    -62.5, 35, 30,
+    // Back face
+    -62.5, 0, -30,
+    62.5, 0, -30,
+    62.5, 35, -30,
+    -62.5, 35, -30,
+];
+
+const wallIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+    // Back face
+    4, 6, 5,
+    4, 7, 6,
+    // Left face
+    0, 3, 7,
+    0, 7, 4,
+    // Right face
+    1, 5, 6,
+    1, 6, 2,
+    // Top face
+    3, 2, 6,
+    3, 6, 7,
+    // Bottom face
+    0, 4, 5,
+    0, 5, 1,
+];
+
+const roofVertices = [
+    // Front face
+    -62.5, 35, 30,
+    62.5, 35, 30,
+    -62.5, 50, 0,
+    62.5, 50, 0,
+    // Back face
+    -62.5, 35, -30,
+    62.5, 35, -30,
+    -62.5, 50, 0,
+    62.5, 50, 0,
+    // Left face
+    -62.5, 35, 30,
+    -62.5, 35, -30,
+    -62.5, 50, 0,
+    // Right face
+    62.5, 35, 30,
+    62.5, 35, -30,
+    62.5, 50, 0,
+];
+
+const roofIndices = [
+    // Front face
+    0, 1, 2,
+    1, 3, 2,
+    // Back face
+    4, 6, 5,
+    5, 6, 7,
+    // Left face
+    8, 9, 10,
+    // Right face
+    11, 12, 13,
+];
+
+const doorVertices = [
+    // Front face
+    -5, 0, 30.1,
+    5, 0, 30.1,
+    5, 25, 30.1,
+    -5, 25, 30.1,
+];
+
+const doorIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const LeftWindow1Vertices = [
+    // Front face
+    -27.5, 15, 30.1,
+    -17.5, 15, 30.1,
+    -17.5, 25, 30.1,
+    -27.5, 25, 30.1,
+];
+
+const LeftWindow1Indices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const LeftWindow2Vertices = [
+    // Front face
+    -40, 15, 30.1,
+    -50, 15, 30.1,
+    -50, 25, 30.1,
+    -40, 25, 30.1,
+];
+
+const LeftWindow2Indices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const RightWindow1Vertices = [
+    // Front face
+    17.5, 15, 30.1,
+    27.5, 15, 30.1,
+    27.5, 25, 30.1,
+    17.5, 25, 30.1,
+];
+
+const RightWindow1Indices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const RightWindow2Vertices = [
+    // Front face
+    40, 15, 30.1,
+    50, 15, 30.1,
+    50, 25, 30.1,
+    40, 25, 30.1,
+];
+
+const RightWindow2Indices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const lateralWindowVertices = [
+    // Front face
+    62.6, 15, -10,
+    62.6, 25, -10,
+    62.6, 25, -20,
+    62.6, 15, -20,
+];
+
+const lateralWindowIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const frontChimneyVertices = [
+    // Front face
+    37.5, 35, 30,
+    37.5, 60, 30,
+    17.5, 60, 30,
+    17.5, 35, 30,
+    // Back face
+    37.5, 35, 15,
+    37.5, 60, 25,
+    17.5, 60, 25,
+    17.5, 35, 15,
+];
+
+const frontChimneyIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+    // Back face
+    4, 5, 6,
+    4, 6, 7,
+    // Top face
+    1, 5, 6,
+    1, 6, 2,
+    // Bottom face
+    0, 4, 7,
+    0, 7, 3,
+    // Left face
+    0, 1, 5,
+    0, 5, 4,
+    // Right face
+    3, 2, 6,
+    3, 6, 7,
+];
+
+const frontChimneyTopVertices = [
+    // Front face
+    37.5, 60, 30,
+    37.5, 65, 30,
+    17.5, 65, 30,
+    17.5, 60, 30,
+    // Back face
+    37.5, 60, 25,
+    37.5, 65, 25,
+    17.5, 65, 25,
+    17.5, 60, 25,
+];
+
+const frontChimneyTopIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+    // Back face
+    4, 5, 6,
+    4, 6, 7,
+    // Top face
+    1, 5, 6,
+    1, 6, 2,
+    // Bottom face
+    0, 4, 7,
+    0, 7, 3,
+    // Left face
+    0, 1, 5,
+    0, 5, 4,
+    // Right face
+    3, 2, 6,
+    3, 6, 7,
+];
+
+const backChimneyVertices = [
+    // Front face
+    37.5, 35, -30,
+    37.5, 60, -30,
+    17.5, 60, -30,
+    17.5, 35, -30,
+    // Back face
+    37.5, 35, -15,
+    37.5, 60, -25,
+    17.5, 60, -25,
+    17.5, 35, -15,
+];
+
+const backChimneyIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+    // Back face
+    4, 5, 6,
+    4, 6, 7,
+    // Top face
+    1, 5, 6,
+    1, 6, 2,
+    // Bottom face
+    0, 4, 7,
+    0, 7, 3,
+    // Left face
+    0, 1, 5,
+    0, 5, 4,
+    // Right face
+    3, 2, 6,
+    3, 6, 7,
+];
+
+const backChimneyTopVertices = [
+    // Front face
+    37.5, 60, -30,
+    37.5, 65, -30,
+    17.5, 65, -30,
+    17.5, 60, -30,
+    // Back face
+    37.5, 60, -25,
+    37.5, 65, -25,
+    17.5, 65, -25,
+    17.5, 60, -25,
+];
+
+const backChimneyTopIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+    // Back face
+    4, 5, 6,
+    4, 6, 7,
+    // Top face
+    1, 5, 6,
+    1, 6, 2,
+    // Bottom face
+    0, 4, 7,
+    0, 7, 3,
+    // Left face
+    0, 1, 5,
+    0, 5, 4,
+    // Right face
+    3, 2, 6,
+    3, 6, 7,
+];
+
+const annexVertices = [
+    // Front face
+    72.5, 0, 25,
+    72.5, 25, 25,
+    72.5, 25, 15,
+    72.5, 0, 15,
+    // Back face
+    62.5, 0, 25,
+    62.5, 25, 25,
+    62.5, 25, 15,
+    62.5, 0, 15,
+];
+
+const annexIndices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+    // Back face
+    4, 5, 6,
+    4, 6, 7,
+    // Top face
+    1, 5, 6,
+    1, 6, 2,
+    // Bottom face
+    0, 4, 7,
+    0, 7, 3,
+    // Left face
+    0, 1, 5,
+    0, 5, 4,
+    // Right face
+    3, 2, 6,
+    3, 6, 7,
+];
+
 ////////////////////////////////
 /* INITIALIZE ANIMATION CYCLE */
 ////////////////////////////////
@@ -64,8 +388,126 @@ function createScene(){
     createSkydome();
     createMoon();
     //createLight();
-    createThree(new THREE.Vector3(0, 0, 0));
+    createHouse();
     createOVNI();
+}
+
+function addHouseWalls(houseMatrix) {
+    'use strict';
+
+    const wallGeometry = new THREE.BufferGeometry();
+    wallGeometry.setAttribute('position', new THREE.Float32BufferAttribute(wallVertices, 3));
+    wallGeometry.setIndex(wallIndices);
+    const wallMaterial = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide });
+    const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+
+    houseMatrix.add(wall);
+
+}
+
+function addHouseRoof(houseMatrix) {
+    'use strict';
+
+    const roofGeometry = new THREE.BufferGeometry();
+    roofGeometry.setAttribute('position', new THREE.Float32BufferAttribute(roofVertices, 3));
+    roofGeometry.setIndex(roofIndices);
+    const roofMaterial = new THREE.MeshBasicMaterial({ color: 'orange', side: THREE.DoubleSide });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+
+    houseMatrix.add(roof);
+
+}
+
+function addHouseDoor(houseMatrix) {
+    'use strict';
+
+    const doorGeometry = new THREE.BufferGeometry();
+    doorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(doorVertices, 3));
+    doorGeometry.setIndex(doorIndices);
+    const doorMaterial = new THREE.MeshBasicMaterial({ color: 'brown', side: THREE.DoubleSide });
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+
+    houseMatrix.add(door);
+
+}
+
+function addHouseWindow(houseMatrix, vertices, indices) {
+    'use strict';
+
+    const windowGeometry = new THREE.BufferGeometry();
+    windowGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    windowGeometry.setIndex(indices);
+    const windowMaterial = new THREE.MeshBasicMaterial({ color: 'blue', side: THREE.DoubleSide });
+    const window = new THREE.Mesh(windowGeometry, windowMaterial);
+
+    houseMatrix.add(window);
+
+}
+
+function addChimney(houseMatrix, vertices, indices, topVertices, topIndices) {
+    'use strict';
+    
+    const chimneyGeometry = new THREE.BufferGeometry();
+    chimneyGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    chimneyGeometry.setIndex(indices);
+    const chimneyMaterial = new THREE.MeshBasicMaterial({ color: 'red', side: THREE.DoubleSide });
+    const chimney = new THREE.Mesh(chimneyGeometry, chimneyMaterial);
+
+    houseMatrix.add(chimney);
+
+    const chimneyTopGeometry = new THREE.BufferGeometry();
+    chimneyTopGeometry.setAttribute('position', new THREE.Float32BufferAttribute(topVertices, 3));
+    chimneyTopGeometry.setIndex(topIndices);
+    const chimneyTopMaterial = new THREE.MeshBasicMaterial({ color: 'brown', side: THREE.DoubleSide });
+    const chimneyTop = new THREE.Mesh(chimneyTopGeometry, chimneyTopMaterial);
+
+    houseMatrix.add(chimneyTop);
+
+}
+
+function addAnnex(houseMatrix) {
+    'use strict';
+
+    const annexGeometry = new THREE.BufferGeometry();    
+    annexGeometry.setAttribute('position', new THREE.Float32BufferAttribute(annexVertices, 3));
+    annexGeometry.setIndex(annexIndices);
+    const annexMaterial = new THREE.MeshBasicMaterial({ color: 'lightblue', side: THREE.DoubleSide });
+    const annex = new THREE.Mesh(annexGeometry, annexMaterial);
+
+    houseMatrix.add(annex);
+
+}
+
+function createHouse() {
+    'use strict';
+
+    const houseMatrix = new THREE.Object3D();
+
+    addHouseWalls(houseMatrix);
+
+    addHouseRoof(houseMatrix);
+
+    addHouseDoor(houseMatrix);
+
+    addHouseWindow(houseMatrix, LeftWindow1Vertices, LeftWindow1Indices);
+
+    addHouseWindow(houseMatrix, LeftWindow2Vertices, LeftWindow2Indices);
+
+    addHouseWindow(houseMatrix, RightWindow1Vertices, RightWindow1Indices);
+
+    addHouseWindow(houseMatrix, RightWindow2Vertices, RightWindow2Indices);
+
+    addHouseWindow(houseMatrix, lateralWindowVertices, lateralWindowIndices);
+
+    addChimney(houseMatrix, frontChimneyVertices, frontChimneyIndices, frontChimneyTopVertices, frontChimneyTopIndices);
+
+    addChimney(houseMatrix, backChimneyVertices, backChimneyIndices, backChimneyTopVertices, backChimneyTopIndices);
+
+    addAnnex(houseMatrix)
+
+    houseMatrix.position.set(-125, 0, -32);
+
+    scene.add(houseMatrix);
 }
 
 function createFloralField() {
@@ -89,7 +531,7 @@ function createFloralField() {
     var defaultRotation = Math.PI / 360;
     var defaultHeight = 3;
     createThree(new THREE.Vector3(0, 7, -150), defaultRotation, defaultHeight);
-    createThree(new THREE.Vector3(-75, 5, -75), 100 * defaultRotation, 1.5 * defaultHeight);
+    createThree(new THREE.Vector3(125, 5, 20), 100 * defaultRotation, 1.5 * defaultHeight);
     createThree(new THREE.Vector3(100, 5, -75), 200 * defaultRotation, 0.5 * defaultHeight);
     createThree(new THREE.Vector3(-90, 5, 100), 150 * defaultRotation, 0.75 * defaultHeight);
     createThree(new THREE.Vector3(100, 5, 125), 40 * defaultRotation, 1.25 * defaultHeight);
@@ -322,7 +764,7 @@ function createOVNI() {
     var whiteColor = 0xFFFFFF;
 
     ovni = new THREE.Object3D();
-    ovni.position.set(20, 50, 0);
+    ovni.position.set(20, 75, 0);
 
     var ovniGeometry = new THREE.SphereGeometry(10, 32, 32);
     var ovniMaterialOptions = [
@@ -379,6 +821,7 @@ function createOVNI() {
     createPointLights(ovni, new THREE.Vector3(0, -0.5, 8));
     createPointLights(ovni, new THREE.Vector3(0, -0.5, -8));
     
+    ovni.scale.set(3.2, 3.2, 3.2);
 
     scene.add(ovni);
 }
@@ -477,7 +920,7 @@ function onKeyDown(e) {
             currentTexture = 2;
             break;
         case 51: // 3
-            camera.position.set(- sceneRadius * 0.9, sceneRadius * 1.3, sceneRadius * 1.3);
+            camera.position.set(- sceneRadius * 0.9, sceneRadius * 0.2, sceneRadius * 0.05);
             camera.lookAt(scene.position);
             break;
         case 52: // 4
