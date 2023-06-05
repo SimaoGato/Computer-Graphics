@@ -398,8 +398,10 @@ function addHouseWalls(houseMatrix) {
     const wallGeometry = new THREE.BufferGeometry();
     wallGeometry.setAttribute('position', new THREE.Float32BufferAttribute(wallVertices, 3));
     wallGeometry.setIndex(wallIndices);
-    const wallMaterial = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide });
+    wallGeometry.computeVertexNormals();
+    const wallMaterial = createMaterials('white', 100);
     const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+    primitiveArray.push(wall);
 
     houseMatrix.add(wall);
 
@@ -411,8 +413,10 @@ function addHouseRoof(houseMatrix) {
     const roofGeometry = new THREE.BufferGeometry();
     roofGeometry.setAttribute('position', new THREE.Float32BufferAttribute(roofVertices, 3));
     roofGeometry.setIndex(roofIndices);
-    const roofMaterial = new THREE.MeshBasicMaterial({ color: 'orange', side: THREE.DoubleSide });
+    roofGeometry.computeVertexNormals();
+    const roofMaterial = createMaterials('orange', 100);
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    primitiveArray.push(roof);
 
     houseMatrix.add(roof);
 
@@ -424,8 +428,10 @@ function addHouseDoor(houseMatrix) {
     const doorGeometry = new THREE.BufferGeometry();
     doorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(doorVertices, 3));
     doorGeometry.setIndex(doorIndices);
-    const doorMaterial = new THREE.MeshBasicMaterial({ color: 'brown', side: THREE.DoubleSide });
+    doorGeometry.computeVertexNormals();
+    const doorMaterial = createMaterials('brown', 100);
     const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    primitiveArray.push(door);
 
     houseMatrix.add(door);
 
@@ -437,8 +443,10 @@ function addHouseWindow(houseMatrix, vertices, indices) {
     const windowGeometry = new THREE.BufferGeometry();
     windowGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     windowGeometry.setIndex(indices);
-    const windowMaterial = new THREE.MeshBasicMaterial({ color: 'blue', side: THREE.DoubleSide });
+    windowGeometry.computeVertexNormals();
+    const windowMaterial = createMaterials('blue', 100);
     const window = new THREE.Mesh(windowGeometry, windowMaterial);
+    primitiveArray.push(window);
 
     houseMatrix.add(window);
 
@@ -450,16 +458,20 @@ function addChimney(houseMatrix, vertices, indices, topVertices, topIndices) {
     const chimneyGeometry = new THREE.BufferGeometry();
     chimneyGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     chimneyGeometry.setIndex(indices);
-    const chimneyMaterial = new THREE.MeshBasicMaterial({ color: 'red', side: THREE.DoubleSide });
+    chimneyGeometry.computeVertexNormals();
+    const chimneyMaterial = createMaterials('red', 100);
     const chimney = new THREE.Mesh(chimneyGeometry, chimneyMaterial);
-
+    primitiveArray.push(chimney);
+    
     houseMatrix.add(chimney);
 
     const chimneyTopGeometry = new THREE.BufferGeometry();
     chimneyTopGeometry.setAttribute('position', new THREE.Float32BufferAttribute(topVertices, 3));
     chimneyTopGeometry.setIndex(topIndices);
-    const chimneyTopMaterial = new THREE.MeshBasicMaterial({ color: 'brown', side: THREE.DoubleSide });
+    chimneyTopGeometry.computeVertexNormals();
+    const chimneyTopMaterial = createMaterials('brown', 100);
     const chimneyTop = new THREE.Mesh(chimneyTopGeometry, chimneyTopMaterial);
+    primitiveArray.push(chimneyTop);
 
     houseMatrix.add(chimneyTop);
 
@@ -471,8 +483,10 @@ function addAnnex(houseMatrix) {
     const annexGeometry = new THREE.BufferGeometry();    
     annexGeometry.setAttribute('position', new THREE.Float32BufferAttribute(annexVertices, 3));
     annexGeometry.setIndex(annexIndices);
-    const annexMaterial = new THREE.MeshBasicMaterial({ color: 'lightblue', side: THREE.DoubleSide });
+    annexGeometry.computeVertexNormals();
+    const annexMaterial = createMaterials('lightblue', 100);
     const annex = new THREE.Mesh(annexGeometry, annexMaterial);
+    primitiveArray.push(annex);
 
     houseMatrix.add(annex);
 
@@ -707,7 +721,7 @@ function createThree(pos, rot, heightScale) {
         var threeBranchMaterial = threeBranchMaterialOptions[0];
         var threeLeafMaterial = threeLeafMaterialOptions[0];
 
-        var branchGeometry = new THREE.CylinderGeometry(0.8, 0.8, heightScale * 20, 32);
+        var branchGeometry = new THREE.CylinderGeometry(1.5, 1.5, heightScale * 20, 32);
         var pBranch = new THREE.Mesh(branchGeometry, threeBranchMaterial);
         primitiveArray.push(pBranch);
         pBranch.position.set(0, heightScale * 10, 0);
@@ -850,6 +864,17 @@ function createPointLights(mat, pos) {
     mat.add(pointLight);
 
     mat.add(sphere);
+}
+
+function createMaterials(color, shininess) { 
+    var materials = [
+        new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide}),
+        new THREE.MeshPhongMaterial({ color: color, shininess: shininess, side: THREE.DoubleSide }),
+        new THREE.MeshToonMaterial({ color: color, side: THREE.DoubleSide })
+    ];
+    materialOptionsArray.push(materials);
+
+    return materials[0];
 }
 
 //////////////////////
