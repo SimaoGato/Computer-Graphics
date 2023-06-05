@@ -13,7 +13,7 @@ var starryTexture = createStarrySkyTexture();
 var directionalLight;
 
 // OVNI
-var ovni;
+var ovni, ovniRot;
 
 var ovniTranslateForward = false;
 var ovniTranslateBackward = false;
@@ -21,6 +21,7 @@ var ovniTranslateLeft = false;
 var ovniTranslateRight = false;
 var ovniMovementSpeed = 1;
 var ovniDiagonalMovementSpeed = Math.sqrt(Math.pow(ovniMovementSpeed, 2) / 2);
+var ovniRotationSpeed = Math.PI / 45;
 
 // Materials
 primitiveArray = [];
@@ -690,7 +691,7 @@ function createMoon() {
     scene.add(moon);
 
     // Create the directional light
-    directionalLight = new THREE.DirectionalLight(moonYellowColor, 0.5);
+    directionalLight = new THREE.DirectionalLight(moonYellowColor, 0.2);
     directionalLight.position.set(1, 1, 1);
     directionalLight.rotateX(Math.PI / 4);
     scene.add(directionalLight);
@@ -767,6 +768,8 @@ function createOVNI() {
     var whiteColor = 0xFFFFFF;
 
     ovni = new THREE.Object3D();
+    ovniRot = new THREE.Object3D();
+
     ovni.position.set(20, 140, 0);
 
     var ovniGeometry = new THREE.SphereGeometry(10, 32, 32);
@@ -775,7 +778,7 @@ function createOVNI() {
     var ovniBody = new THREE.Mesh(ovniGeometry, ovniMaterial);
     primitiveArray.push(ovniBody);
     ovniBody.scale.set(1, 0.2, 1);
-    ovni.add(ovniBody);
+    ovniRot.add(ovniBody);
 
     const radius = 4; // Radius of the UFO
     const thetaStart = 0; // Starting angle of the cap
@@ -789,26 +792,26 @@ function createOVNI() {
     cockpit.position.set(0, 1.5, 0);
     cockpit.rotation.x = - Math.PI / 2;
     cockpit.scale.set(1, 1, 1);
-    ovni.add(cockpit);
+    ovniRot.add(cockpit);
 
     var bottomCylinderGeometry = new THREE.CylinderGeometry(2, 2, 2, 32);
     var bottomCylinderMaterial = createMaterials(darkGreyColor, 100);
     var bottomCylinder = new THREE.Mesh(bottomCylinderGeometry, bottomCylinderMaterial);
     primitiveArray.push(bottomCylinder);
     bottomCylinder.position.set(0, -2, 0);
-    ovni.add(bottomCylinder);
+    ovniRot.add(bottomCylinder);
 
-    const spotLight = new THREE.SpotLight(whiteColor, 1, 130);// Color, Intensity, Distance
+    const spotLight = new THREE.SpotLight(whiteColor, 5, 130);// Color, Intensity, Distance
     spotLight.position.set(0, -3, 0);
-    ovni.add(spotLight);
+    ovniRot.add(spotLight);
     
-    createPointLights(ovni, new THREE.Vector3(8, -0.5, 0));
-    createPointLights(ovni, new THREE.Vector3(-8, -0.5, 0));
-    createPointLights(ovni, new THREE.Vector3(0, -0.5, 8));
-    createPointLights(ovni, new THREE.Vector3(0, -0.5, -8));
+    createPointLights(ovniRot, new THREE.Vector3(8, -0.5, 0));
+    createPointLights(ovniRot, new THREE.Vector3(-8, -0.5, 0));
+    createPointLights(ovniRot, new THREE.Vector3(0, -0.5, 8));
+    createPointLights(ovniRot, new THREE.Vector3(0, -0.5, -8));
     
     ovni.scale.set(3.2, 3.2, 3.2);
-
+    ovni.add(ovniRot);
     scene.add(ovni);
 }
 
@@ -818,7 +821,7 @@ function createPointLights(mat, pos) {
     var blueColor = 0x0000FF;
     var redColor = 0xFF0000;
 
-    var sphereMaterial = createMaterials(blueColor, 100);
+    var sphereMaterial = createMaterials(redColor, 100);
     var sphereGeometry = new THREE.SphereGeometry(1.5, 32, 32);
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     primitiveArray.push(sphere);
@@ -870,13 +873,18 @@ function update(){
         currentMaterial = (currentMaterial + 1) % 3;
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][currentMaterial];
-            console.log(currentMaterial);
         }
         materialSwitch = false;
     }
 
     // OVNI movement
-        
+
+    ovniRot.rotation.y += ovniRotationSpeed;
+
+    var prevOvniXPos = ovni.position.x;
+    var prevOvniZPos = ovni.position.z;
+
+
     if (ovniTranslateForward && ovniTranslateLeft) {
         ovni.translateZ(ovniDiagonalMovementSpeed);
         ovni.translateX(-ovniDiagonalMovementSpeed);
@@ -904,6 +912,11 @@ function update(){
     }
     else if (ovniTranslateRight) {
         ovni.translateX(ovniMovementSpeed);
+    }
+
+    if (Math.pow(ovni.position.x, 2) + Math.pow(ovni.position.z, 2) > Math.pow(sceneRadius - 60, 2)) {
+        ovni.position.x = prevOvniXPos;
+        ovni.position.z = prevOvniZPos;
     }
     
 }
