@@ -12,6 +12,15 @@ var starryTexture = createStarrySkyTexture();
 // MOON Light
 var directionalLight;
 
+// OVNI
+var ovni;
+
+// Materials
+primitiveArray = [];
+materialOptionsArray = [];
+var materialSwitch = false;
+var currentMaterial = 0;
+
 ////////////////////////////////
 /* INITIALIZE ANIMATION CYCLE */
 ////////////////////////////////
@@ -36,6 +45,7 @@ function init() {
 function animate() {
     'use strict';
     
+    update();
     render();
     requestAnimationFrame(animate);   
 }
@@ -55,6 +65,7 @@ function createScene(){
     createMoon();
     //createLight();
     createThree(new THREE.Vector3(0, 0, 0));
+    createOVNI();
 }
 
 function createFloralField() {
@@ -233,17 +244,34 @@ function createThree(pos, rot, heightScale) {
     var threeBrownOrangeColor = 0x8B4513;
     var threeLeafColor = 0x228B22;
 
-    var threeBranchMaterial = new THREE.MeshBasicMaterial({ color: threeBrownOrangeColor });
-    var threeLeafMaterial = new THREE.MeshBasicMaterial({ color: threeLeafColor });
 
     function createBranch(matrix) {
         'use strict';
+
+        var threeBranchMaterialOptions = [
+            new THREE.MeshLambertMaterial({ color: threeBrownOrangeColor }),
+            new THREE.MeshPhongMaterial({ color: threeBrownOrangeColor, shininess: 100 }),
+            new THREE.MeshToonMaterial({ color: threeBrownOrangeColor })
+        ];
+        materialOptionsArray.push(threeBranchMaterialOptions);
+        var threeLeafMaterialOptions = [
+            new THREE.MeshLambertMaterial({ color: threeLeafColor }),
+            new THREE.MeshPhongMaterial({ color: threeLeafColor, shininess: 100 }),
+            new THREE.MeshToonMaterial({ color: threeLeafColor })
+        ];
+        materialOptionsArray.push(threeLeafMaterialOptions);
+
+        var threeBranchMaterial = threeBranchMaterialOptions[0];
+        var threeLeafMaterial = threeLeafMaterialOptions[0];
+
         var branchGeometry = new THREE.CylinderGeometry(0.8, 0.8, heightScale * 20, 32);
         var pBranch = new THREE.Mesh(branchGeometry, threeBranchMaterial);
+        primitiveArray.push(pBranch);
         pBranch.position.set(0, heightScale * 10, 0);
     
         var pLeafGeometry = new THREE.SphereGeometry(heightScale * 8, 32, 32);
         var pLeaf = new THREE.Mesh(pLeafGeometry, threeLeafMaterial);
+        primitiveArray.push(pLeaf);
         pLeaf.scale.set(1, 0.6, 1);
         pLeaf.position.set(0, heightScale * 22, 0);
     
@@ -252,7 +280,7 @@ function createThree(pos, rot, heightScale) {
     }
 
     var three = new THREE.Object3D();
-    three.position.set(pos.x,pos.y + 0.3,pos.z);
+    three.position.set(pos.x,pos.y + 0.3, pos.z);
     three.rotation.y = rot;
 
     var mainBranch = new THREE.Object3D();
@@ -266,13 +294,118 @@ function createThree(pos, rot, heightScale) {
     secondaryBranch.scale.set(0.8,0.8,0.8);
     mainBranch.add(secondaryBranch);
 
+
+    var baseThreeMaterialOptions = [
+        new THREE.MeshLambertMaterial({ color: threeBrownOrangeColor }),
+        new THREE.MeshPhongMaterial({ color: threeBrownOrangeColor, shininess: 100 }),
+        new THREE.MeshToonMaterial({ color: threeBrownOrangeColor })
+    ];
+    materialOptionsArray.push(baseThreeMaterialOptions);
+    var baseThreeMaterial = baseThreeMaterialOptions[0];
     var baseThreeGeometry = new THREE.CylinderGeometry(0.72, 0.72, 0.7, 32);
-    var baseThree = new THREE.Mesh(baseThreeGeometry, threeBranchMaterial);
+    var baseThree = new THREE.Mesh(baseThreeGeometry, baseThreeMaterial);
+    primitiveArray.push(baseThree);
     baseThree.position.set(0, -0.05, 0);
     three.add(baseThree);
 
     three.add(mainBranch);
     scene.add(three);
+}
+
+function createOVNI() {
+    'use strict';
+
+    var lightGreyColor = 0x696969;
+    var darkGreyColor = 0x222222;
+    var greenColor = 0x00FF00;
+    var whiteColor = 0xFFFFFF;
+
+    ovni = new THREE.Object3D();
+    ovni.position.set(20, 50, 0);
+
+    var ovniGeometry = new THREE.SphereGeometry(10, 32, 32);
+    var ovniMaterialOptions = [
+        new THREE.MeshLambertMaterial({ color: lightGreyColor }),
+        new THREE.MeshPhongMaterial({ color: lightGreyColor, shininess: 100 }),
+        new THREE.MeshToonMaterial({ color: lightGreyColor })
+    ];
+    materialOptionsArray.push(ovniMaterialOptions);
+    var ovniMaterial = ovniMaterialOptions[0];
+    var ovniBody = new THREE.Mesh(ovniGeometry, ovniMaterial);
+    primitiveArray.push(ovniBody);
+    ovniBody.scale.set(1, 0.2, 1);
+    ovni.add(ovniBody);
+
+    const radius = 4; // Radius of the UFO
+    const thetaStart = 0; // Starting angle of the cap
+    const thetaLength = Math.PI; // Angle range of the cap (half a sphere)
+    const segments = 32; // Number of segments for the geometry
+    const cockpitGeometry = new THREE.SphereGeometry(radius, segments, segments, thetaStart, thetaLength);
+    const cockpitMaterialOptions = [
+        new THREE.MeshLambertMaterial({ color: greenColor }),
+        new THREE.MeshPhongMaterial({ color: greenColor, shininess: 100 }),
+        new THREE.MeshToonMaterial({ color: greenColor })
+    ];
+    materialOptionsArray.push(cockpitMaterialOptions);
+    const material = cockpitMaterialOptions[0];
+    const cockpit = new THREE.Mesh(cockpitGeometry, material);
+    primitiveArray.push(cockpit);
+
+    cockpit.position.set(0, 1.5, 0);
+    cockpit.rotation.x = - Math.PI / 2;
+    cockpit.scale.set(1, 1, 1);
+    ovni.add(cockpit);
+
+    var bottomCylinderGeometry = new THREE.CylinderGeometry(2, 2, 2, 32);
+    var bottomCylinderMaterialOptions = [
+        new THREE.MeshLambertMaterial({ color: darkGreyColor }),
+        new THREE.MeshPhongMaterial({ color: darkGreyColor, shininess: 100 }),
+        new THREE.MeshToonMaterial({ color: darkGreyColor })
+    ];
+    materialOptionsArray.push(bottomCylinderMaterialOptions);
+    var bottomCylinderMaterial = bottomCylinderMaterialOptions[0];
+    var bottomCylinder = new THREE.Mesh(bottomCylinderGeometry, bottomCylinderMaterial);
+    primitiveArray.push(bottomCylinder);
+    bottomCylinder.position.set(0, -2, 0);
+    ovni.add(bottomCylinder);
+
+    const spotLight = new THREE.SpotLight(whiteColor, 1, 70);// Color, Intensity, Distance
+    spotLight.position.set(0, -3, 0);
+    ovni.add(spotLight);
+    
+    createPointLights(ovni, new THREE.Vector3(8, -0.5, 0));
+    createPointLights(ovni, new THREE.Vector3(-8, -0.5, 0));
+    createPointLights(ovni, new THREE.Vector3(0, -0.5, 8));
+    createPointLights(ovni, new THREE.Vector3(0, -0.5, -8));
+    
+
+    scene.add(ovni);
+}
+
+function createPointLights(mat, pos) {
+    'use strict';
+
+    var blueColor = 0x0000FF;
+    var redColor = 0xFF0000;
+    var sphereMaterialOptions = [
+        new THREE.MeshLambertMaterial({ color: blueColor }),
+        new THREE.MeshPhongMaterial({ color: blueColor, shininess: 100 }),
+        new THREE.MeshToonMaterial({ color: blueColor })
+    ]
+    materialOptionsArray.push(sphereMaterialOptions);
+    var sphereMaterial = sphereMaterialOptions[0];
+    var sphereGeometry = new THREE.SphereGeometry(1.5, 32, 32);
+    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    primitiveArray.push(sphere);
+    sphere.position.x = pos.x;
+    sphere.position.y = pos.y;
+    sphere.position.z = pos.z;
+
+    var pointLight = new THREE.PointLight(redColor, 1, 30);
+    pointLight.position.set(pos.x, pos.y - 3, pos.z);
+    mat.add(pointLight);
+
+    mat.add(sphere);
 }
 
 //////////////////////
@@ -296,6 +429,15 @@ function handleCollisions(){
 ////////////
 function update(){
     'use strict';
+
+    if (materialSwitch) {
+        currentMaterial = (currentMaterial + 1) % 3;
+        for (var i = 0; i < primitiveArray.length; i++) {
+            primitiveArray[i].material = materialOptionsArray[i][currentMaterial];
+            console.log(currentMaterial);
+        }
+        materialSwitch = false;
+    }
     
 }
 
@@ -350,6 +492,11 @@ function onKeyDown(e) {
         case 68:
         case 100:
             directionalLight.visible = !directionalLight.visible;
+            break;
+        // letter r or R
+        case 82:
+        case 114:
+            materialSwitch = true;
             break;
     }
 
