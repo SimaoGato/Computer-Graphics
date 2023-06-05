@@ -2,7 +2,7 @@
 /* GLOBAL VARIABLES */
 //////////////////////
 var scene, camera, renderer;
-var plane, sceneRadius = 100;
+var plane, sceneRadius = 250;
 
 // Create the floral field texture
 var floralFieldTexture = createFloralFieldTexture();
@@ -61,34 +61,34 @@ function createFloralField() {
     'use strict'
 
     const loader = new THREE.TextureLoader();
-    const height = loader.load('js/heightmap.png');
+    const height = loader.load('images/heightmap.png');
 
     const geometry = new THREE.CircleGeometry(sceneRadius, 100);
     const material = new THREE.MeshStandardMaterial({
-        color : 'gray',
+        color : 'white',
         map: floralFieldTexture,
         displacementMap: height,
-        displacementScale: 2,
+        displacementScale: 100,
     });
 
     plane = new THREE.Mesh(geometry, material);
-    plane.position.set(0, -0.4, 0);
+    plane.position.set(0, -5, 0);
     plane.rotation.x = Math.PI * -0.5;
 
     var defaultRotation = Math.PI / 360;
-    var defaultHeight = 1;
-    createThree(new THREE.Vector3(0, 0, -60), defaultRotation, defaultHeight);
-    createThree(new THREE.Vector3(-30, 0, -30), 100 * defaultRotation, 1.5 * defaultHeight);
-    createThree(new THREE.Vector3(40, 0, -30), 200 * defaultRotation, 0.5 * defaultHeight);
-    createThree(new THREE.Vector3(-35, 0, 40), 150 * defaultRotation, 0.75 * defaultHeight);
-    createThree(new THREE.Vector3(20, 0, 50), 40 * defaultRotation, 1.25 * defaultHeight);
+    var defaultHeight = 3;
+    createThree(new THREE.Vector3(0, 7, -150), defaultRotation, defaultHeight);
+    createThree(new THREE.Vector3(-75, 5, -75), 100 * defaultRotation, 1.5 * defaultHeight);
+    createThree(new THREE.Vector3(100, 5, -75), 200 * defaultRotation, 0.5 * defaultHeight);
+    createThree(new THREE.Vector3(-90, 5, 100), 150 * defaultRotation, 0.75 * defaultHeight);
+    createThree(new THREE.Vector3(100, 5, 125), 40 * defaultRotation, 1.25 * defaultHeight);
     scene.add(plane);
 }
 
 function createSkydome() {
     'use strict';
     
-    const skydomeGeometry = new THREE.SphereGeometry(sceneRadius, 64, 32, 0, Math.PI , 0, Math.PI / 1.7);
+    const skydomeGeometry = new THREE.SphereGeometry(sceneRadius, 64, 32, 0, Math.PI , 0, Math.PI);
     const skydomeMaterial = new THREE.MeshStandardMaterial({
         map: starryTexture,
         side: THREE.BackSide
@@ -115,10 +115,10 @@ function createFloralFieldTexture() {
 
     // Draw the flowers
     var colors = ['#ffffff', '#ffff00', '#c8a2c8', '#add8e6'];
-    for (var i = 0; i < 750; i++) {
+    for (var i = 0; i < 10000; i++) {
         var x = Math.random() * canvas.width;
         var y = Math.random() * canvas.height;
-        var radius = Math.random() * 5 + 2;
+        var radius = Math.random() * 0.5 + 2;
         var color = colors[Math.floor(Math.random() * colors.length)];
 
         context.beginPath();
@@ -204,12 +204,13 @@ function createMoon() {
     var moonYellowColor = 0xf5e38d;
 
     // Create the moon
-    var moonGeometry = new THREE.SphereGeometry(10, 32, 32);
-    var moonMaterial = new THREE.MeshBasicMaterial({
-        color: moonYellowColor
+    var moonGeometry = new THREE.SphereGeometry(20, 32, 32);
+    var moonMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: moonYellowColor,
     });
     var moon = new THREE.Mesh(moonGeometry, moonMaterial);
-    moon.position.set(40, 80, -30);
+    moon.position.set(90, 180, -80);
     scene.add(moon);
 
     // Create the directional light
@@ -238,7 +239,7 @@ function createThree(pos, rot, heightScale) {
 
     function createBranch(matrix) {
         'use strict';
-        var branchGeometry = new THREE.CylinderGeometry(0.8, 0.8, heightScale * 20, 32);
+        var branchGeometry = new THREE.CylinderGeometry(2.5, 2.5, heightScale * 20, 32);
         var pBranch = new THREE.Mesh(branchGeometry, threeBranchMaterial);
         pBranch.position.set(0, heightScale * 10, 0);
     
