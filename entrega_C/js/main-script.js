@@ -4,6 +4,20 @@
 var scene, camera, renderer;
 var plane, sceneRadius = 250;
 
+const colors = {
+    RED: 0xff0000,
+    GREEN: 0x00ff00,
+    BLUE: 0x0000ff,
+    WHITE: 0xffffff,
+    MOONYELLOW: 0xf5e38d,
+    BROWNORANGEISH: 0x8B4513,
+    LEAF: 0x228B22,
+    LIGHTGREY: 0x696969,
+    DARKGREY: 0x222222,
+    BLUE: 0x0000FF,
+    WHITE: 0xFFFFFF
+};
+
 // Create the floral field texture
 var floralFieldTexture = createFloralFieldTexture();
 // Create the starry sky texture
@@ -21,13 +35,16 @@ var ovniTranslateLeft = false;
 var ovniTranslateRight = false;
 var ovniMovementSpeed = 1;
 var ovniDiagonalMovementSpeed = Math.sqrt(Math.pow(ovniMovementSpeed, 2) / 2);
-var ovniRotationSpeed = Math.PI / 45;
+var ovniRotationSpeed = Math.PI / 90;
 
 // Materials
 primitiveArray = [];
 materialOptionsArray = [];
-var materialSwitch = false;
-var currentMaterial = 0;
+
+var lambertMaterial = true;
+var phongMaterial = false;
+var toonMaterial = false;
+var basicMaterial = false;
 
 // House Components
 
@@ -541,14 +558,39 @@ function createFloralField() {
     const height = loader.load('images/heightmap.png');
 
     const geometry = new THREE.CircleGeometry(sceneRadius, 100);
-    const material = new THREE.MeshStandardMaterial({
-        color : 'white',
-        map: floralFieldTexture,
-        displacementMap: height,
-        displacementScale: 100,
-    });
+    const materialOptions = [
+        new THREE.MeshLambertMaterial({
+            color: 'white',
+            map: floralFieldTexture,
+            displacementMap: height,
+            displacementScale: 100,
+        }),
+        new THREE.MeshPhongMaterial({
+            color: 'white',
+            map: floralFieldTexture,
+            displacementMap: height,
+            displacementScale: 100,
+        }),
+        new THREE.MeshToonMaterial({
+            color: 'white',
+            map: floralFieldTexture,
+            displacementMap: height,
+            displacementScale: 100,
+        }),
+        new THREE.MeshBasicMaterial({
+            color: 'white', 
+            map: floralFieldTexture,
+            displacementMap: height,
+            displacementScale: 100,
+        }),
+    ];
+    const material = materialOptions[0];
+    materialOptionsArray.push(materialOptions);
+
 
     plane = new THREE.Mesh(geometry, material);
+    primitiveArray.push(plane);
+
     plane.position.set(0, -5, 0);
     plane.rotation.x = Math.PI * -0.5;
 
@@ -678,20 +720,18 @@ function createLight() {
 function createMoon() {
     'use strict'
 
-    var moonYellowColor = 0xf5e38d;
-
     // Create the moon
     var moonGeometry = new THREE.SphereGeometry(20, 32, 32);
     var moonMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        emissive: moonYellowColor,
+        color: colors.WHITE,
+        emissive: colors.MOONYELLOW,
     });
     var moon = new THREE.Mesh(moonGeometry, moonMaterial);
     moon.position.set(90, 180, -80);
     scene.add(moon);
 
     // Create the directional light
-    directionalLight = new THREE.DirectionalLight(moonYellowColor, 0.2);
+    directionalLight = new THREE.DirectionalLight(colors.MOONYELLOW, 0.2);
     directionalLight.position.set(1, 1, 1);
     directionalLight.rotateX(Math.PI / 4);
     scene.add(directionalLight);
@@ -708,15 +748,12 @@ function createMoon() {
 function createThree(pos, rot, heightScale) {
     'use strict';
 
-    var threeBrownOrangeColor = 0x8B4513;
-    var threeLeafColor = 0x228B22;
-
 
     function createBranch(matrix) {
         'use strict';
 
-        var threeBranchMaterial = createMaterials(threeBrownOrangeColor, 100);
-        var threeLeafMaterial = createMaterials(threeLeafColor, 100);
+        var threeBranchMaterial = createMaterials(colors.BROWNORANGEISH, 100);
+        var threeLeafMaterial = createMaterials(colors.LEAF, 100);
 
         var branchGeometry = new THREE.CylinderGeometry(1.5, 1.5, heightScale * 20, 32);
         var pBranch = new THREE.Mesh(branchGeometry, threeBranchMaterial);
@@ -748,7 +785,7 @@ function createThree(pos, rot, heightScale) {
     secondaryBranch.scale.set(0.8,0.8,0.8);
     mainBranch.add(secondaryBranch);
 
-    var baseThreeMaterial = createMaterials(threeBrownOrangeColor, 100);
+    var baseThreeMaterial = createMaterials(colors.BROWNORANGEISH, 100);
     var baseThreeGeometry = new THREE.CylinderGeometry(0.72, 0.72, 0.7, 32);
     var baseThree = new THREE.Mesh(baseThreeGeometry, baseThreeMaterial);
     primitiveArray.push(baseThree);
@@ -762,11 +799,6 @@ function createThree(pos, rot, heightScale) {
 function createOVNI() {
     'use strict';
 
-    var lightGreyColor = 0x696969;
-    var darkGreyColor = 0x222222;
-    var greenColor = 0x00FF00;
-    var whiteColor = 0xFFFFFF;
-
     ovni = new THREE.Object3D();
     ovniRot = new THREE.Object3D();
 
@@ -774,7 +806,7 @@ function createOVNI() {
 
     var ovniGeometry = new THREE.SphereGeometry(10, 32, 32);
 
-    var ovniMaterial = createMaterials(lightGreyColor, 100);
+    var ovniMaterial = createMaterials(colors.LIGHTGREY, 100);
     var ovniBody = new THREE.Mesh(ovniGeometry, ovniMaterial);
     primitiveArray.push(ovniBody);
     ovniBody.scale.set(1, 0.2, 1);
@@ -785,7 +817,7 @@ function createOVNI() {
     const thetaLength = Math.PI; // Angle range of the cap (half a sphere)
     const segments = 32; // Number of segments for the geometry
     const cockpitGeometry = new THREE.SphereGeometry(radius, segments, segments, thetaStart, thetaLength);
-    const material = createMaterials(greenColor, 150);
+    const material = createMaterials(colors.BLUE, 150);
     const cockpit = new THREE.Mesh(cockpitGeometry, material);
     primitiveArray.push(cockpit);
 
@@ -795,13 +827,13 @@ function createOVNI() {
     ovniRot.add(cockpit);
 
     var bottomCylinderGeometry = new THREE.CylinderGeometry(2, 2, 2, 32);
-    var bottomCylinderMaterial = createMaterials(darkGreyColor, 100);
+    var bottomCylinderMaterial = createMaterials(colors.DARKGREY, 100);
     var bottomCylinder = new THREE.Mesh(bottomCylinderGeometry, bottomCylinderMaterial);
     primitiveArray.push(bottomCylinder);
     bottomCylinder.position.set(0, -2, 0);
     ovniRot.add(bottomCylinder);
 
-    const spotLight = new THREE.SpotLight(whiteColor, 5, 130);// Color, Intensity, Distance
+    const spotLight = new THREE.SpotLight(colors.WHITE, 5, 130);// Color, Intensity, Distance
     spotLight.position.set(0, -3, 0);
     ovniRot.add(spotLight);
     
@@ -818,10 +850,7 @@ function createOVNI() {
 function createPointLights(mat, pos) {
     'use strict';
 
-    var blueColor = 0x0000FF;
-    var redColor = 0xFF0000;
-
-    var sphereMaterial = createMaterials(redColor, 100);
+    var sphereMaterial = createMaterials(colors.RED, 100);
     var sphereGeometry = new THREE.SphereGeometry(1.5, 32, 32);
     var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     primitiveArray.push(sphere);
@@ -829,7 +858,7 @@ function createPointLights(mat, pos) {
     sphere.position.y = pos.y;
     sphere.position.z = pos.z;
 
-    var pointLight = new THREE.PointLight(redColor, 1, 80);
+    var pointLight = new THREE.PointLight(colors.RED, 1, 80);
     pointLight.position.set(pos.x, pos.y - 3, pos.z);
     mat.add(pointLight);
 
@@ -840,7 +869,8 @@ function createMaterials(color, shininess) {
     var materials = [
         new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide}),
         new THREE.MeshPhongMaterial({ color: color, shininess: shininess, side: THREE.DoubleSide }),
-        new THREE.MeshToonMaterial({ color: color, side: THREE.DoubleSide })
+        new THREE.MeshToonMaterial({ color: color, side: THREE.DoubleSide }),
+        new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide })
     ];
     materialOptionsArray.push(materials);
 
@@ -869,13 +899,42 @@ function handleCollisions(){
 function update(){
     'use strict';
 
-    if (materialSwitch) {
-        currentMaterial = (currentMaterial + 1) % 3;
+    /*if (materialSwitch) {
+        currentMaterial = (currentMaterial + 1) % 4;
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][currentMaterial];
         }
         materialSwitch = false;
+    }*/
+
+    if (lambertMaterial) {
+        for (var i = 0; i < primitiveArray.length; i++) {
+            primitiveArray[i].material = materialOptionsArray[i][0];
+        }
+        lambertMaterial = false;
     }
+
+    if (phongMaterial) {
+        for (var i = 0; i < primitiveArray.length; i++) {
+            primitiveArray[i].material = materialOptionsArray[i][1];
+        }
+        phongMaterial = false;
+    }
+
+    if (toonMaterial) {
+        for (var i = 0; i < primitiveArray.length; i++) {
+            primitiveArray[i].material = materialOptionsArray[i][2];
+        }
+        toonMaterial = false;
+    }
+
+    if (basicMaterial) {
+        for (var i = 0; i < primitiveArray.length; i++) {
+            primitiveArray[i].material = materialOptionsArray[i][3];
+        }
+        basicMaterial = false;
+    }
+
 
     // OVNI movement
 
@@ -980,10 +1039,41 @@ function onKeyDown(e) {
         case 100:
             directionalLight.visible = !directionalLight.visible;
             break;
+        
+        // letter q or Q
+        case 81:
+        case 113:
+            lambertMaterial = true;
+            phongMaterial = false;
+            toonMaterial = false;
+            basicMaterial = false;
+            break;
+        
+        // letter w or W
+        case 87:
+        case 119:
+            lambertMaterial = false;
+            phongMaterial = true;
+            toonMaterial = false;
+            basicMaterial = false;
+            break;
+        
+        // letter e or E
+        case 69:
+        case 101:
+            lambertMaterial = false;
+            phongMaterial = false;
+            toonMaterial = true;
+            basicMaterial = false;
+            break;
+
         // letter r or R
         case 82:
         case 114:
-            materialSwitch = true;
+            lambertMaterial = false;
+            phongMaterial = false;
+            toonMaterial = false;
+            basicMaterial = true;
             break;
 
         // Arrow keys to move ovni
