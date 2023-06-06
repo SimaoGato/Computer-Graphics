@@ -24,6 +24,7 @@ var floralFieldTexture = createFloralFieldTexture();
 var starryTexture = createStarrySkyTexture();
 
 // MOON Light
+var moon;
 var directionalLight;
 var switchDirectionalLight = false;
 
@@ -423,7 +424,6 @@ function createScene(){
     createFloralField();
     createSkydome();
     createMoon();
-    //createLight();
     createHouse();
     createOVNI();
 }
@@ -717,15 +717,6 @@ function createCamera(){
 /////////////////////
 /* CREATE LIGHT(S) */
 /////////////////////
-function createLight() {
-    // const pointLight = new THREE.PointLight(0xffffff, 2);
-    // pointLight.position.set(10, 10, 10);
-    // scene.add(pointLight); 
-    
-    const light = new THREE.AmbientLight(0xffffff, 2); // soft white light
-    scene.add( light );
-}
-
 function createMoon() {
     'use strict'
 
@@ -735,13 +726,13 @@ function createMoon() {
         color: colors.WHITE,
         emissive: colors.MOONYELLOW,
     });
-    var moon = new THREE.Mesh(moonGeometry, moonMaterial);
+    moon = new THREE.Mesh(moonGeometry, moonMaterial);
     moon.position.set(90, 180, -80);
     scene.add(moon);
 
     // Create the directional light
     directionalLight = new THREE.DirectionalLight(colors.MOONYELLOW, 0.2);
-    directionalLight.position.set(1, 1, 1);
+    directionalLight.position.set(90, 180, -80);
     directionalLight.rotateX(Math.PI / 4);
     scene.add(directionalLight);
 
@@ -951,8 +942,15 @@ function update(){
     }
 
     // MOON Directional Light
+    // MOON Directional Light
 
     if (switchDirectionalLight) {
+        if (moon.material.emissiveIntensity == 1) {
+            moon.material.emissiveIntensity = 0;
+        }
+        else {
+            moon.material.emissiveIntensity = 1;
+        }
         directionalLight.visible = !directionalLight.visible;
         switchDirectionalLight = false;
     }
