@@ -25,10 +25,19 @@ var starryTexture = createStarrySkyTexture();
 
 // MOON Light
 var directionalLight;
+var switchDirectionalLight = false;
 
 // OVNI
 var ovni, ovniRot;
 
+// OVNI Lights
+var ovniSpotLight;
+var ovniPointLightsArray= [];
+
+var ovniSwitchSpotLight = false;
+var ovniSwitchPointLights = false;
+
+// OVNI Movement
 var ovniTranslateForward = false;
 var ovniTranslateBackward = false;
 var ovniTranslateLeft = false;
@@ -833,9 +842,9 @@ function createOVNI() {
     bottomCylinder.position.set(0, -2, 0);
     ovniRot.add(bottomCylinder);
 
-    const spotLight = new THREE.SpotLight(colors.WHITE, 5, 130);// Color, Intensity, Distance
-    spotLight.position.set(0, -3, 0);
-    ovniRot.add(spotLight);
+    ovniSpotLight = new THREE.SpotLight(colors.WHITE, 5, 130);// Color, Intensity, Distance
+    ovniSpotLight.position.set(0, -3, 0);
+    ovniRot.add(ovniSpotLight);
     
     createPointLights(ovniRot, new THREE.Vector3(8, -0.5, 0));
     createPointLights(ovniRot, new THREE.Vector3(-8, -0.5, 0));
@@ -861,6 +870,7 @@ function createPointLights(mat, pos) {
     var pointLight = new THREE.PointLight(colors.RED, 1, 80);
     pointLight.position.set(pos.x, pos.y - 3, pos.z);
     mat.add(pointLight);
+    ovniPointLightsArray.push(pointLight);
 
     mat.add(sphere);
 }
@@ -899,14 +909,6 @@ function handleCollisions(){
 function update(){
     'use strict';
 
-    /*if (materialSwitch) {
-        currentMaterial = (currentMaterial + 1) % 4;
-        for (var i = 0; i < primitiveArray.length; i++) {
-            primitiveArray[i].material = materialOptionsArray[i][currentMaterial];
-        }
-        materialSwitch = false;
-    }*/
-
     if (lambertMaterial) {
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][0];
@@ -914,25 +916,45 @@ function update(){
         lambertMaterial = false;
     }
 
-    if (phongMaterial) {
+    else if (phongMaterial) {
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][1];
         }
         phongMaterial = false;
     }
 
-    if (toonMaterial) {
+    else if (toonMaterial) {
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][2];
         }
         toonMaterial = false;
     }
 
-    if (basicMaterial) {
+    else if (basicMaterial) {
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][3];
         }
         basicMaterial = false;
+    }
+
+    // OVNI Lights
+    if (ovniSwitchPointLights) {
+        for (var i = 0; i < ovniPointLightsArray.length; i++) {
+            ovniPointLightsArray[i].visible = !ovniPointLightsArray[i].visible;
+        }
+        ovniSwitchPointLights = false;
+    }
+
+    if (ovniSwitchSpotLight) {
+        ovniSpotLight.visible = !ovniSpotLight.visible;
+        ovniSwitchSpotLight = false;
+    }
+
+    // MOON Directional Light
+
+    if (switchDirectionalLight) {
+        directionalLight.visible = !directionalLight.visible;
+        switchDirectionalLight = false;
     }
 
 
@@ -1037,9 +1059,19 @@ function onKeyDown(e) {
         // letter d or D
         case 68:
         case 100:
-            directionalLight.visible = !directionalLight.visible;
+            switchDirectionalLight = true;
             break;
-        
+
+        // letter s or S
+        case 83:
+        case 115:
+            ovniSwitchSpotLight = true;
+            break;
+        case 80:
+        case 112:
+            ovniSwitchPointLights = true;
+            break;
+
         // letter q or Q
         case 81:
         case 113:
@@ -1048,7 +1080,6 @@ function onKeyDown(e) {
             toonMaterial = false;
             basicMaterial = false;
             break;
-        
         // letter w or W
         case 87:
         case 119:
@@ -1057,7 +1088,6 @@ function onKeyDown(e) {
             toonMaterial = false;
             basicMaterial = false;
             break;
-        
         // letter e or E
         case 69:
         case 101:
@@ -1066,7 +1096,6 @@ function onKeyDown(e) {
             toonMaterial = true;
             basicMaterial = false;
             break;
-
         // letter r or R
         case 82:
         case 114:
