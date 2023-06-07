@@ -1,8 +1,14 @@
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-var scene, camera, renderer;
+var scene, camera, stereoCamera, renderer;
 var plane, sceneRadius = 250;
+
+var defaultCamera, isDefaultCamera = true;
+
+// AUXILIAR CAMERAS - TODO: REMOVE
+var topCamera, sideCamera;
+var isTopCamera = false, isSideCamera = false;
 
 const colors = {
     RED: 0xff0000,
@@ -393,7 +399,12 @@ function init() {
     document.body.appendChild(renderer.domElement);
     
     createScene();
-    createCamera();
+    createDefaultCamera();
+    createStereoCamera();
+
+    // AUXILIAR CAMERAS - TODO: REMOVE
+    createTopCamera();
+    createSideCamera();
     
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
@@ -418,14 +429,18 @@ function createScene(){
     'use strict';
     
     scene = new THREE.Scene();
-    
-    scene.add(new THREE.AxisHelper(10));
+
+    scene.background = new THREE.Color(0x000000);
     
     createFloralField();
     createSkydome();
     createMoon();
     createHouse();
     createOVNI();
+
+    //create vr button
+    document.body.appendChild( VRButton.createButton( renderer ) );
+    renderer.xr.enabled = true;
 }
 
 function addHouseWalls(houseMatrix) {
@@ -704,14 +719,46 @@ function createStarrySkyTexture() {
 //////////////////////
 /* CREATE CAMERA(S) */
 //////////////////////
-function createCamera(){
+function createDefaultCamera(){
     'use strict';
 
-    camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(- sceneRadius * 0.9, sceneRadius * 1.3, sceneRadius * 1.3);
-    camera.lookAt(scene.position);
+    defaultCamera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+    defaultCamera.position.set(0, sceneRadius * 0.1, sceneRadius);
+    var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
+    defaultCamera.lookAt(pos);
+}
+
+function createTopCamera(){
+    'use strict';
+
+    topCamera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+    topCamera.position.set(0, sceneRadius * 2, 0);
+    var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
+    topCamera.lookAt(scene.position);
+}
+
+function createSideCamera(){
+    'use strict';
+
+    sideCamera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+    sideCamera.position.set(- sceneRadius * 0.9, sceneRadius * 0.2, sceneRadius * 0.05);
+    var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
+    sideCamera.lookAt(scene.position);
+}
+
+function createStereoCamera() {
+    'use strict';
+
+    stereoCamera = new THREE.StereoCamera();
     
-    scene.add(camera);
+    // Add the stereo camera to the scene
+    scene.add(stereoCamera.cameraL);
+    scene.add(stereoCamera.cameraR);
+
+    // Set up the renderer for stereo rendering
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.autoClear = false;
 }
 
 /////////////////////
@@ -900,6 +947,16 @@ function handleCollisions(){
 function update(){
     'use strict';
 
+    if(isDefaultCamera) {
+        camera = defaultCamera;
+    }
+    else if(isTopCamera) {
+        camera = topCamera;
+    }
+    else if(isSideCamera) {
+        camera = sideCamera;
+    }
+
     if (lambertMaterial) {
         for (var i = 0; i < primitiveArray.length; i++) {
             primitiveArray[i].material = materialOptionsArray[i][0];
@@ -1007,6 +1064,26 @@ function render() {
     'use strict';
     
     renderer.render(scene, camera);
+
+    renderer.setAnimationLoop( function () {
+
+        renderer.render( scene, camera );
+    
+    } );
+
+    // // Set the camera position and direction
+    // camera.updateMatrixWorld();
+    // stereoCamera.update(camera);
+
+    // // Render the left eye
+    // renderer.setViewport(0, 0, window.innerWidth / 2, window.innerHeight);
+    // renderer.setScissor(0, 0, window.innerWidth / 2, window.innerHeight);
+    // renderer.render(scene, stereoCamera.cameraL);
+
+    // // Render the right eye
+    // renderer.setViewport(window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
+    // renderer.setScissor(window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
+    // renderer.render(scene, stereoCamera.cameraR);
     
 }
 
@@ -1034,25 +1111,25 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
         case 49: // 1
-            terrain.material.map = floralFieldTexture;
-            currentTexture = 1;
+            isDefaultCamera = true;
             break;
         case 50: // 2   
             terrain.material.map = starryTexture;
             currentTexture = 2;
             break;
         case 51: // 3
-            camera.position.set(- sceneRadius * 0.9, sceneRadius * 0.2, sceneRadius * 0.05);
-            camera.lookAt(scene.position);
+            terrain.material.map = floralFieldTexture;
+            currentTexture = 1;
             break;
-        case 52: // 4
-            camera.position.set(0, sceneRadius * 2, 0);
-            camera.lookAt(scene.position);
+        case 52: // 4 - AUXILIAR CAMERA TODO: REMOVE
+            isTopCamera = true;
+            isDefaultCamera = false;
+            isSideCamera = false;
             break;
-        case 53: // 5
-            camera.position.set(0, sceneRadius * 0.1, sceneRadius);
-            var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
-            camera.lookAt(pos);
+        case 53: // 5 - AUXILIAR CAMERA TODO: REMOVE
+            isSideCamera = true;
+            isTopCamera = false;
+            isDefaultCamera = false;
             break;
         // letter d or D
         case 68:
