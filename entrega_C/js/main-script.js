@@ -3,8 +3,12 @@
 //////////////////////
 var scene, camera, renderer;
 var plane, sceneRadius = 250;
+var skydome;
 
 var defaultCamera, isDefaultCamera = true;
+
+var applyFloralFieldTexture = false;
+var applyStarrySkyTexture = false;
 
 // AUXILIAR CAMERAS - TODO: REMOVE
 var topCamera, sideCamera;
@@ -25,9 +29,9 @@ const colors = {
 };
 
 // Create the floral field texture
-var floralFieldTexture = createFloralFieldTexture();
+var floralFieldTexture = new THREE.Texture();
 // Create the starry sky texture
-var starryTexture = createStarrySkyTexture();
+var starryTexture = new THREE.Texture();
 
 // MOON Light
 var moon;
@@ -709,7 +713,7 @@ function createSkydome() {
         side: THREE.BackSide
     });
 
-    const skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial);
+    skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial);
     skydome.position.set(0, 0, 0);
     scene.add(skydome);
     skydome.rotation.x = Math.PI * -0.5;
@@ -1011,6 +1015,18 @@ function handleCollisions(){
 function update(){
     'use strict';
 
+    if(applyFloralFieldTexture) {
+        floralFieldTexture = createFloralFieldTexture();
+        plane.material.map = floralFieldTexture;
+        applyFloralFieldTexture = false;
+    }
+
+    if(applyStarrySkyTexture) {
+        starryTexture = createStarrySkyTexture();
+        skydome.material.map = starryTexture;
+        applyStarrySkyTexture = false;
+    }
+
     if(isDefaultCamera) {
         camera = defaultCamera;
     }
@@ -1162,13 +1178,11 @@ function onKeyDown(e) {
         case 49: // 1
             isDefaultCamera = true;
             break;
-        case 50: // 2   
-            terrain.material.map = starryTexture;
-            currentTexture = 2;
+        case 50: // 2
+            applyStarrySkyTexture = true;
             break;
         case 51: // 3
-            terrain.material.map = floralFieldTexture;
-            currentTexture = 1;
+            applyFloralFieldTexture = true;
             break;
         case 52: // 4 - AUXILIAR CAMERA TODO: REMOVE
             isTopCamera = true;
