@@ -582,39 +582,14 @@ function createFloralField() {
     const height = loader.load('images/heightmap.png');
 
     const geometry = new THREE.CircleGeometry(sceneRadius, 100);
-    const materialOptions = [
-        new THREE.MeshLambertMaterial({
-            color: 'white',
-            map: floralFieldTexture,
-            displacementMap: height,
-            displacementScale: 100,
-        }),
-        new THREE.MeshPhongMaterial({
-            color: 'white',
-            map: floralFieldTexture,
-            displacementMap: height,
-            displacementScale: 100,
-        }),
-        new THREE.MeshToonMaterial({
-            color: 'white',
-            map: floralFieldTexture,
-            displacementMap: height,
-            displacementScale: 100,
-        }),
-        new THREE.MeshBasicMaterial({
-            color: 'white', 
-            map: floralFieldTexture,
-            displacementMap: height,
-            displacementScale: 100,
-        }),
-    ];
-    const material = materialOptions[0];
-    materialOptionsArray.push(materialOptions);
-
+    const material = new THREE.MeshPhongMaterial({
+        color: 'white',
+        map: floralFieldTexture,
+        displacementMap: height,
+        displacementScale: 100,
+    });
 
     plane = new THREE.Mesh(geometry, material);
-    primitiveArray.push(plane);
-
     plane.position.set(0, -5, 0);
     plane.rotation.x = Math.PI * -0.5;
 
@@ -632,7 +607,7 @@ function createSkydome() {
     'use strict';
     
     const skydomeGeometry = new THREE.SphereGeometry(sceneRadius, 64, 32, 0, Math.PI , 0, Math.PI);
-    const skydomeMaterial = new THREE.MeshStandardMaterial({
+    const skydomeMaterial = new THREE.MeshPhongMaterial({
         map: starryTexture,
         side: THREE.BackSide
     });
@@ -769,11 +744,18 @@ function createMoon() {
 
     // Create the moon
     var moonGeometry = new THREE.SphereGeometry(20, 32, 32);
-    var moonMaterial = new THREE.MeshStandardMaterial({
-        color: colors.WHITE,
-        emissive: colors.MOONYELLOW,
-    });
+    
+    var materials = [
+        new THREE.MeshLambertMaterial({ color: colors.MOONYELLOW, side: THREE.DoubleSide, emissive: colors.MOONYELLOW }),
+        new THREE.MeshPhongMaterial({ color: colors.MOONYELLOW, side: THREE.DoubleSide, emissive: colors.MOONYELLOW }),
+        new THREE.MeshToonMaterial({ color: colors.MOONYELLOW, side: THREE.DoubleSide, emissive: colors.MOONYELLOW }),
+        new THREE.MeshBasicMaterial({ color: colors.MOONYELLOW, side: THREE.DoubleSide })
+    ];
+    materialOptionsArray.push(materials);
+    var moonMaterial = materials[0];
+
     moon = new THREE.Mesh(moonGeometry, moonMaterial);
+    primitiveArray.push(moon);
     moon.position.set(90, 180, -80);
     scene.add(moon);
 
