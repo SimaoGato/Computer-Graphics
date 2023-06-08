@@ -1,7 +1,7 @@
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
-var scene, camera, stereoCamera, renderer;
+var scene, camera, renderer;
 var plane, sceneRadius = 250;
 
 var defaultCamera, isDefaultCamera = true;
@@ -400,7 +400,6 @@ function init() {
     
     createScene();
     createDefaultCamera();
-    createStereoCamera();
 
     // AUXILIAR CAMERAS - TODO: REMOVE
     createTopCamera();
@@ -721,21 +720,6 @@ function createSideCamera(){
     sideCamera.lookAt(scene.position);
 }
 
-function createStereoCamera() {
-    'use strict';
-
-    stereoCamera = new THREE.StereoCamera();
-    
-    // Add the stereo camera to the scene
-    scene.add(stereoCamera.cameraL);
-    scene.add(stereoCamera.cameraR);
-
-    // Set up the renderer for stereo rendering
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.autoClear = false;
-}
-
 /////////////////////
 /* CREATE LIGHT(S) */
 /////////////////////
@@ -1052,21 +1036,6 @@ function render() {
         renderer.render( scene, camera );
     
     } );
-
-    // // Set the camera position and direction
-    // camera.updateMatrixWorld();
-    // stereoCamera.update(camera);
-
-    // // Render the left eye
-    // renderer.setViewport(0, 0, window.innerWidth / 2, window.innerHeight);
-    // renderer.setScissor(0, 0, window.innerWidth / 2, window.innerHeight);
-    // renderer.render(scene, stereoCamera.cameraL);
-
-    // // Render the right eye
-    // renderer.setViewport(window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
-    // renderer.setScissor(window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
-    // renderer.render(scene, stereoCamera.cameraR);
-    
 }
 
 
