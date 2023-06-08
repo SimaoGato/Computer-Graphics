@@ -75,28 +75,104 @@ const wallVertices = [
     62.5, 0, -30,
     62.5, 35, -30,
     -62.5, 35, -30,
+    // Far left window
+    -50, 15, 30,
+    -40, 15, 30,
+    -40, 25, 30,
+    -50, 25, 30,
+    // Near left window
+    -27.5, 15, 30,
+    -17.5, 15, 30,
+    -17.5, 25, 30,
+    -27.5, 25, 30,
+    // Near right window
+    17.5, 15, 30,
+    27.5, 15, 30,
+    27.5, 25, 30,
+    17.5, 25, 30,
+    // Far right window
+    40, 15, 30,
+    50, 15, 30,
+    50, 25, 30,
+    40, 25, 30,
+    // Door
+    -5, 0, 30,
+    5, 0, 30,
+    5, 25, 30,
+    -5, 25, 30,
+    // Auxiliary vertices for front wall
+    -62.5, 15, 30,
+    -62.5, 25, 30,
+    62.5, 15, 30,
+    62.5, 25, 30,
+    -5, 15, 30,
+    5, 15, 30,
+    // Right wall window vertices
+    62.5, 15, -10,
+    62.5, 25, -10,
+    62.5, 25, -20,
+    62.5, 15, -20,
+    // Auxiliary vertices for right wall
+    62.5, 15, 30,
+    62.5, 25, 30,
+    62.5, 25, -30,
+    62.5, 15, -30,
 ];
 
 const wallIndices = [
-    // Front face
-    0, 1, 2,
-    0, 2, 3,
-    // Back face
+    /* -------- Front face -------- */
+    // Top Bar
+    29, 31, 2,
+    2, 3, 29,
+    // Bottom Left Bar
+    0, 24, 32,
+    32, 28, 0,
+    // Bottom Right Bar
+    25, 1, 30,
+    30, 33, 25,
+    // Far left collumn
+    28, 8, 11,
+    11, 29, 28,
+    // Middle left collumn
+    9, 12, 15,
+    15, 10, 9,
+    // Near left collumn
+    13, 32, 27,
+    27, 14, 13,
+    // Near right collumn
+    33, 16, 19,
+    19, 26, 33,
+    // Middle right collumn
+    17, 20, 23,
+    23, 18, 17,
+    // Far right collumn
+    21, 30, 31,
+    31, 22, 21,
+
+    /* -------- Back face -------- */
     4, 6, 5,
     4, 7, 6,
-    // Left face
+
+    /* -------- Left face -------- */
     0, 3, 7,
     0, 7, 4,
-    // Right face
-    1, 5, 6,
-    1, 6, 2,
-    // Top face
-    3, 2, 6,
-    3, 6, 7,
-    // Bottom face
-    0, 4, 5,
-    0, 5, 1,
+
+    /* -------- Right face -------- */
+    // Top bar
+    39, 40, 6,
+    6, 2, 39,
+    // Bottom bar
+    1, 5, 41,
+    41, 38, 1,
+    // Window left bar
+    38, 34, 35,
+    35, 39, 38,
+    // Window right bar
+    37, 41, 40,
+    40, 36, 37,
 ];
+
+
 
 const roofVertices = [
     // Front face
@@ -104,40 +180,63 @@ const roofVertices = [
     62.5, 35, 30,
     -62.5, 50, 0,
     62.5, 50, 0,
+    17.5, 35, 30,
+    17.5, 50, 0,
+    17.5, 41.25, 17.5,
+    37.5, 41.25, 17.5,
+    37.5, 50, 0,
+    37.5, 35, 30,
+
     // Back face
-    -62.5, 35, -30,
+    -62.5, 35, -30, // 10
     62.5, 35, -30,
     -62.5, 50, 0,
     62.5, 50, 0,
+    17.5, 35, -30,
+    17.5, 50, 0,
+    17.5, 41.25, -17.5,
+    37.5, 41.25, -17.5,
+    37.5, 50, 0,
+    37.5, 35, -30,
+
     // Left face
-    -62.5, 35, 30,
+    -62.5, 35, 30, // 20
     -62.5, 35, -30,
     -62.5, 50, 0,
     // Right face
-    62.5, 35, 30,
+    62.5, 35, 30, // 23
     62.5, 35, -30,
     62.5, 50, 0,
+    
 ];
 
 const roofIndices = [
     // Front face
-    0, 1, 2,
-    1, 3, 2,
+    0, 4, 5,
+    5, 2, 0,
+    6, 7, 8,
+    8, 5, 6,
+    9, 1, 3,
+    3, 8, 9,
     // Back face
-    4, 6, 5,
-    5, 6, 7,
+    10, 14, 15,
+    15, 12, 10,
+    16, 17, 18,
+    18, 15, 16,
+    19, 11, 13,
+    13, 18, 19,
     // Left face
-    8, 9, 10,
+    20, 21, 22,
     // Right face
-    11, 12, 13,
+    23, 24, 25,
 ];
 
 const doorVertices = [
     // Front face
-    -5, 0, 30.1,
-    5, 0, 30.1,
-    5, 25, 30.1,
-    -5, 25, 30.1,
+    -5, 0, 30,
+    5, 0, 30,
+    5, 25, 30,
+    -5, 25, 30,
 ];
 
 const doorIndices = [
@@ -146,57 +245,57 @@ const doorIndices = [
     0, 2, 3,
 ];
 
-const LeftWindow1Vertices = [
+const leftWindow1Vertices = [
     // Front face
-    -27.5, 15, 30.1,
-    -17.5, 15, 30.1,
-    -17.5, 25, 30.1,
-    -27.5, 25, 30.1,
+    -27.5, 15, 30,
+    -17.5, 15, 30,
+    -17.5, 25, 30,
+    -27.5, 25, 30,
 ];
 
-const LeftWindow1Indices = [
-    // Front face
-    0, 1, 2,
-    0, 2, 3,
-];
-
-const LeftWindow2Vertices = [
-    // Front face
-    -40, 15, 30.1,
-    -50, 15, 30.1,
-    -50, 25, 30.1,
-    -40, 25, 30.1,
-];
-
-const LeftWindow2Indices = [
+const leftWindow1Indices = [
     // Front face
     0, 1, 2,
     0, 2, 3,
 ];
 
-const RightWindow1Vertices = [
+const leftWindow2Vertices = [
     // Front face
-    17.5, 15, 30.1,
-    27.5, 15, 30.1,
-    27.5, 25, 30.1,
-    17.5, 25, 30.1,
+    -40, 15, 30,
+    -50, 15, 30,
+    -50, 25, 30,
+    -40, 25, 30,
 ];
 
-const RightWindow1Indices = [
+const leftWindow2Indices = [
     // Front face
     0, 1, 2,
     0, 2, 3,
 ];
 
-const RightWindow2Vertices = [
+const rightWindow1Vertices = [
     // Front face
-    40, 15, 30.1,
-    50, 15, 30.1,
-    50, 25, 30.1,
-    40, 25, 30.1,
+    17.5, 15, 30,
+    27.5, 15, 30,
+    27.5, 25, 30,
+    17.5, 25, 30,
 ];
 
-const RightWindow2Indices = [
+const rightWindow1Indices = [
+    // Front face
+    0, 1, 2,
+    0, 2, 3,
+];
+
+const rightWindow2Vertices = [
+    // Front face
+    40, 15, 30,
+    50, 15, 30,
+    50, 25, 30,
+    40, 25, 30,
+];
+
+const rightWindow2Indices = [
     // Front face
     0, 1, 2,
     0, 2, 3,
@@ -204,10 +303,10 @@ const RightWindow2Indices = [
 
 const lateralWindowVertices = [
     // Front face
-    62.6, 15, -10,
-    62.6, 25, -10,
-    62.6, 25, -20,
-    62.6, 15, -20,
+    62.5, 15, -10,
+    62.5, 25, -10,
+    62.5, 25, -20,
+    62.5, 15, -20,
 ];
 
 const lateralWindowIndices = [
@@ -553,13 +652,13 @@ function createHouse() {
 
     addHouseDoor(houseMatrix);
 
-    addHouseWindow(houseMatrix, LeftWindow1Vertices, LeftWindow1Indices);
+    addHouseWindow(houseMatrix, leftWindow1Vertices, leftWindow1Indices);
 
-    addHouseWindow(houseMatrix, LeftWindow2Vertices, LeftWindow2Indices);
+    addHouseWindow(houseMatrix, leftWindow2Vertices, leftWindow2Indices);
 
-    addHouseWindow(houseMatrix, RightWindow1Vertices, RightWindow1Indices);
+    addHouseWindow(houseMatrix, rightWindow1Vertices, rightWindow1Indices);
 
-    addHouseWindow(houseMatrix, RightWindow2Vertices, RightWindow2Indices);
+    addHouseWindow(houseMatrix, rightWindow2Vertices, rightWindow2Indices);
 
     addHouseWindow(houseMatrix, lateralWindowVertices, lateralWindowIndices);
 
@@ -591,7 +690,6 @@ function createFloralField() {
     plane = new THREE.Mesh(geometry, material);
     plane.position.set(0, -5, 0);
     plane.rotation.x = Math.PI * -0.5;
-
     var defaultRotation = Math.PI / 360;
     var defaultHeight = 3;
     createThree(new THREE.Vector3(0, 7, -150), defaultRotation, defaultHeight);
