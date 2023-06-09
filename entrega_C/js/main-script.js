@@ -5,14 +5,14 @@ var scene, camera, renderer;
 var plane, sceneRadius = 250;
 var skydome;
 
+// AUXILIAR CAMERAS
 var defaultCamera, isDefaultCamera = true;
-
-var applyFloralFieldTexture = false;
-var applyStarrySkyTexture = false;
-
-// AUXILIAR CAMERAS - TODO: REMOVE
 var topCamera, sideCamera;
 var isTopCamera = false, isSideCamera = false;
+
+// TEXTURES
+var applyFloralFieldTexture = false;
+var applyStarrySkyTexture = false;
 
 const colors = {
     RED: 0xff0000,
@@ -66,8 +66,7 @@ var phongMaterial = false;
 var toonMaterial = false;
 var basicMaterial = false;
 
-// House Components
-
+// HOUSE COMPONENTS
 const wallVertices = [
     // Front face
     -62.5, 0, 30,
@@ -543,6 +542,8 @@ function createScene(){
     //create vr button
     document.body.appendChild( VRButton.createButton( renderer ) );
     renderer.xr.enabled = true;
+
+    scene.position.set(0, -10, 0);
 }
 
 function addHouseWalls(houseMatrix) {
@@ -698,7 +699,7 @@ function createFloralField() {
     var defaultHeight = 3;
     createThree(new THREE.Vector3(0, 7, -150), defaultRotation, defaultHeight);
     createThree(new THREE.Vector3(125, 5, 20), 100 * defaultRotation, 1.5 * defaultHeight);
-    createThree(new THREE.Vector3(100, 5, -75), 200 * defaultRotation, 0.5 * defaultHeight);
+    createThree(new THREE.Vector3(100, 25, -75), 200 * defaultRotation, 0.5 * defaultHeight);
     createThree(new THREE.Vector3(-90, 5, 100), 150 * defaultRotation, 0.75 * defaultHeight);
     createThree(new THREE.Vector3(100, 5, 125), 40 * defaultRotation, 1.25 * defaultHeight);
     scene.add(plane);
@@ -714,7 +715,7 @@ function createSkydome() {
     });
 
     skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial);
-    skydome.position.set(0, 0, 0);
+    skydome.position.set(0, -5, 0);
     scene.add(skydome);
     skydome.rotation.x = Math.PI * -0.5;
 }
@@ -766,8 +767,11 @@ function createStarrySkyTexture() {
 
     // Draw the background
     var gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#1e1e3c');
-    gradient.addColorStop(1, '#3c1e3c');
+    gradient.addColorStop(0, '#291f50');   // Darker purple
+    gradient.addColorStop(0.3, '#4e3880'); // Dark purple
+    gradient.addColorStop(0.5, '#7e59a8'); // Medium purple
+    gradient.addColorStop(0.7, '#b18fd6'); // Light purple
+    gradient.addColorStop(1, '#001f3f');   // Dark blue
     context.fillStyle = gradient;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -808,8 +812,7 @@ function createTopCamera(){
     'use strict';
 
     topCamera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
-    topCamera.position.set(0, sceneRadius * 2, 0);
-    var pos = new THREE.Vector3(0, sceneRadius * 0.2, 0);
+    topCamera.position.set(- sceneRadius * 1.3, sceneRadius * 1.3, sceneRadius * 1.3);
     topCamera.lookAt(scene.position);
 }
 
@@ -973,7 +976,7 @@ function createPointLights(mat, pos) {
     sphere.position.y = pos.y;
     sphere.position.z = pos.z;
 
-    var pointLight = new THREE.PointLight(colors.RED, 1, 80);
+    var pointLight = new THREE.PointLight(colors.RED, 0.4, 80);
     pointLight.position.set(pos.x, pos.y - 3, pos.z);
     mat.add(pointLight);
     ovniPointLightsArray.push(pointLight);
@@ -991,22 +994,6 @@ function createMaterials(color, shininess) {
     materialOptionsArray.push(materials);
 
     return materials[0];
-}
-
-//////////////////////
-/* CHECK COLLISIONS */
-//////////////////////
-function checkCollisions(){
-    'use strict';
-
-}
-
-///////////////////////
-/* HANDLE COLLISIONS */
-///////////////////////
-function handleCollisions(){
-    'use strict';
-    
 }
 
 ////////////
@@ -1159,11 +1146,18 @@ function render() {
 function onResize() { 
     'use strict';
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+    if (renderer.xr.isPresenting) {
+        renderer.xr.isPresenting = false;
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.isPresenting = true;
+    }
+    else {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        console.log("RESIZE" + renderer.getSize());
+        if (window.innerHeight > 0 && window.innerWidth > 0) {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        }
     }
 
 }
@@ -1176,20 +1170,20 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
         case 49: // 1
-            isDefaultCamera = true;
+            applyFloralFieldTexture = true;
             break;
         case 50: // 2
             applyStarrySkyTexture = true;
             break;
         case 51: // 3
-            applyFloralFieldTexture = true;
+            isDefaultCamera = true; 
             break;
-        case 52: // 4 - AUXILIAR CAMERA TODO: REMOVE
+        case 52: // 4
             isTopCamera = true;
             isDefaultCamera = false;
             isSideCamera = false;
             break;
-        case 53: // 5 - AUXILIAR CAMERA TODO: REMOVE
+        case 53: // 5
             isSideCamera = true;
             isTopCamera = false;
             isDefaultCamera = false;
@@ -1199,7 +1193,6 @@ function onKeyDown(e) {
         case 100:
             switchDirectionalLight = true;
             break;
-
         // letter s or S
         case 83:
         case 115:
@@ -1209,7 +1202,6 @@ function onKeyDown(e) {
         case 112:
             ovniSwitchPointLights = true;
             break;
-
         // letter q or Q
         case 81:
         case 113:
@@ -1242,7 +1234,6 @@ function onKeyDown(e) {
             toonMaterial = false;
             basicMaterial = true;
             break;
-
         // Arrow keys to move ovni
         case 37: // left arrow
             ovniTranslateLeft = true;
